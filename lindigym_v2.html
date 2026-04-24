@@ -1,0 +1,1027 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<title>LindiGym</title>
+<link href="https://cdn.jsdelivr.net/npm/beercss@3.6.13/dist/cdn/beer.min.css" rel="stylesheet">
+<script type="module" src="https://cdn.jsdelivr.net/npm/beercss@3.6.13/dist/cdn/beer.min.js"></script>
+<style>
+/* ══════════════════════════════════════════
+   DARK M3 TOKENS
+══════════════════════════════════════════ */
+:root {
+  --primary:              #9DD67C;
+  --on-primary:           #0F3900;
+  --primary-container:    #1E5206;
+  --on-primary-container: #B7F397;
+  --surface:              #111411;
+  --surface-container:    #1C1F1A;
+  --surface-low:          #161918;
+  --on-surface:           #E2E3DC;
+  --on-surface-var:       #8E9389;
+  --outline:              #3A3E38;
+  --outline-dim:          #252924;
+  --warmup-bg:            #2D2200;
+  --warmup-color:         #FFBA4D;
+  --input-focus-border:   #9DD67C;
+  --danger:               #FFB4AB;
+  --danger-bg:            #93000A;
+  --deload-color:         #FFD680;
+  --deload-bg:            #3D2E00;
+  --rest-chip-bg:         #1E5206;
+  --rest-chip-color:      #B7F397;
+}
+
+/* ══════════════════════════════════════════
+   FIGMA UI TOKENS (day screen)
+══════════════════════════════════════════ */
+:root {
+  --fig-bg:           #EDE9FF;
+  --fig-card:         #FEF7FF;
+  --fig-selected:     #E7E1F5;
+  --fig-bar:          #9381D9;
+  --fig-btn:          #4E42B8;
+  --fig-text:         #1A1A2E;
+  --fig-sub:          #6B6B8A;
+  --fig-border:       #E8E4F0;
+  --fig-check:        #4E42B8;
+  --fig-divider:      #F0EDF8;
+}
+
+* { box-sizing: border-box; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; }
+
+html, body {
+  background: var(--surface);
+  color: var(--on-surface);
+  font-family: -apple-system, 'SF Pro Display', 'Google Sans', 'Roboto', system-ui, sans-serif;
+  max-width: 480px;
+  margin: 0 auto;
+  min-height: 100vh;
+  -webkit-font-smoothing: antialiased;
+  overflow-x: hidden;
+}
+
+/* ══════════════════════════════════════════
+   SCREENS
+══════════════════════════════════════════ */
+.screen { display: none; min-height: 100vh; padding-bottom: 80px; }
+.screen.active { display: block; }
+#screen-profile.active { display: flex; }
+#screen-day.active { display: block; background: var(--fig-bg); }
+
+/* ══════════════════════════════════════════
+   DARK TOP BAR (home + week)
+══════════════════════════════════════════ */
+.top-bar-dark {
+  position: sticky; top: 0; z-index: 100;
+  background: var(--surface-container);
+  border-bottom: 1px solid var(--outline);
+  display: flex; align-items: center;
+  padding: 12px 10px; gap: 6px;
+}
+.icon-btn {
+  width: 40px; height: 40px;
+  display: flex; align-items: center; justify-content: center;
+  border-radius: 50%; border: none; background: transparent;
+  color: var(--on-surface); cursor: pointer; font-size: 20px; flex-shrink: 0;
+}
+.icon-btn:active { background: rgba(157,214,124,0.12); }
+.bar-title-dark { flex: 1; font-size: 17px; font-weight: 700; letter-spacing: 0.03em; }
+
+/* ══════════════════════════════════════════
+   FIGMA TOP BAR (day screen)
+══════════════════════════════════════════ */
+.top-bar-fig {
+  position: sticky; top: 0; z-index: 100;
+  background: var(--fig-bar);
+  display: flex; align-items: center;
+  padding: 12px 16px; gap: 8px;
+}
+.fig-back-btn {
+  background: transparent; border: none;
+  color: white; font-size: 22px;
+  cursor: pointer; padding: 4px;
+  display: flex; align-items: center; flex-shrink: 0;
+}
+.fig-bar-title {
+  flex: 1; color: white;
+  font-size: 18px; font-weight: 600;
+}
+.fig-complete-btn {
+  background: var(--fig-btn); color: white;
+  border: none; border-radius: 100px;
+  padding: 10px 20px;
+  font-size: 15px; font-weight: 600;
+  cursor: pointer; font-family: inherit; white-space: nowrap;
+}
+.fig-complete-btn:active { opacity: 0.85; }
+
+/* ══════════════════════════════════════════
+   PROFILE SCREEN
+══════════════════════════════════════════ */
+#screen-profile {
+  flex-direction: column; align-items: center;
+  justify-content: center; padding: 40px 24px; gap: 0;
+}
+.profile-logo { font-size: 36px; font-weight: 900; letter-spacing: 0.1em; margin-bottom: 8px; }
+.profile-logo span { color: var(--primary); }
+.profile-tagline { font-size: 13px; color: var(--on-surface-var); margin-bottom: 48px; }
+.profile-label { font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.14em; color: var(--on-surface-var); margin-bottom: 16px; }
+.profile-cards { display: flex; gap: 14px; width: 100%; max-width: 340px; }
+.profile-card { flex: 1; background: var(--surface-low); border: 2px solid var(--outline); border-radius: 20px; padding: 24px 16px; display: flex; flex-direction: column; align-items: center; gap: 12px; cursor: pointer; transition: border-color 0.2s, transform 0.15s; }
+.profile-card:active { transform: scale(0.95); }
+.profile-card:hover { border-color: var(--primary); }
+.profile-avatar { width: 64px; height: 64px; border-radius: 50%; background: var(--primary-container); display: flex; align-items: center; justify-content: center; font-size: 28px; }
+.profile-name { font-size: 20px; font-weight: 800; }
+.profile-sub { font-size: 11px; color: var(--on-surface-var); text-align: center; line-height: 1.4; }
+
+/* ══════════════════════════════════════════
+   HOME SCREEN
+══════════════════════════════════════════ */
+.home-hero { padding: 28px 18px 20px; }
+.profile-badge { display: inline-flex; align-items: center; gap: 6px; background: var(--surface-container); border: 1px solid var(--outline); border-radius: 20px; padding: 6px 12px; font-size: 12px; font-weight: 600; color: var(--on-surface-var); cursor: pointer; margin-bottom: 4px; }
+.profile-badge:active { opacity: 0.7; }
+.home-greeting { font-size: 13px; font-weight: 600; color: var(--on-surface-var); text-transform: uppercase; letter-spacing: 0.1em; margin-bottom: 6px; }
+.home-title { font-size: 42px; font-weight: 900; line-height: 1; letter-spacing: -0.01em; margin-bottom: 20px; }
+.home-title span { color: var(--primary); }
+.meso-card { background: var(--primary-container); border-radius: 16px; padding: 16px 18px; }
+.meso-card-label { font-size: 10px; font-weight: 800; text-transform: uppercase; letter-spacing: 0.12em; color: var(--on-primary-container); opacity: 0.7; margin-bottom: 4px; }
+.meso-card-text { font-size: 13px; color: var(--on-primary-container); line-height: 1.5; font-weight: 500; }
+.section-header { padding: 0 18px; margin: 24px 0 10px; font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.12em; color: var(--on-surface-var); }
+.weeks-list { padding: 0 12px; }
+.week-row { background: var(--surface-low); border: 1px solid var(--outline); border-radius: 14px; padding: 14px 16px; margin-bottom: 8px; display: flex; align-items: center; gap: 14px; cursor: pointer; transition: transform 0.12s; }
+.week-row:active { transform: scale(0.98); }
+.week-row.done { border-color: var(--primary); }
+.week-row.deload { background: var(--deload-bg); border-color: var(--deload-color); }
+.week-check { width: 28px; height: 28px; border-radius: 50%; border: 2px solid var(--outline); display: flex; align-items: center; justify-content: center; flex-shrink: 0; font-size: 14px; font-weight: 900; transition: all 0.2s; }
+.week-check.done { background: var(--primary); border-color: var(--primary); color: var(--on-primary); }
+.week-info { flex: 1; }
+.week-name { font-weight: 700; font-size: 16px; margin-bottom: 2px; }
+.week-sub { font-size: 12px; color: var(--on-surface-var); }
+.week-row.deload .week-name { color: var(--deload-color); }
+.week-row.deload .week-sub { color: var(--deload-color); opacity: 0.7; }
+.week-arrow { color: var(--on-surface-var); font-size: 18px; }
+.btn-reset { display: block; width: calc(100% - 24px); margin: 20px 12px 0; padding: 14px; border-radius: 12px; border: 1.5px solid var(--danger-bg); background: transparent; color: var(--danger); font-size: 14px; font-weight: 700; cursor: pointer; font-family: inherit; }
+.btn-reset:active { opacity: 0.7; }
+
+/* ══════════════════════════════════════════
+   WEEK SCREEN
+══════════════════════════════════════════ */
+.week-hero { padding: 24px 18px 16px; }
+.week-hero-title { font-size: 38px; font-weight: 900; letter-spacing: -0.01em; margin-bottom: 16px; }
+.days-list { padding: 0 12px; }
+.day-row { background: var(--surface-low); border: 1px solid var(--outline); border-radius: 14px; padding: 16px; margin-bottom: 8px; display: flex; align-items: center; gap: 14px; cursor: pointer; transition: transform 0.12s; }
+.day-row:active { transform: scale(0.98); }
+.day-row.done { border-color: var(--primary); }
+.day-check { width: 28px; height: 28px; border-radius: 8px; border: 2px dashed var(--outline); display: flex; align-items: center; justify-content: center; font-size: 14px; font-weight: 900; flex-shrink: 0; transition: all 0.2s; }
+.day-check.done { background: var(--primary); border: 2px solid var(--primary); color: var(--on-primary); }
+.day-name { font-size: 19px; font-weight: 700; flex: 1; }
+.day-sub { font-size: 12px; color: var(--on-surface-var); }
+
+/* ══════════════════════════════════════════
+   DAY SCREEN — FIGMA UI
+══════════════════════════════════════════ */
+.day-progress {
+  margin: 10px 16px 8px;
+  display: flex; align-items: center; gap: 10px;
+}
+.progress-bar { flex: 1; height: 4px; background: #D4CCEF; border-radius: 2px; overflow: hidden; }
+.progress-fill { height: 100%; background: var(--fig-btn); border-radius: 2px; transition: width 0.4s ease; }
+.progress-label { font-size: 11px; font-weight: 700; color: var(--fig-sub); white-space: nowrap; }
+
+/* Cards list */
+.ex-list { padding: 4px 0 80px; display: flex; flex-direction: column; gap: 4px; }
+
+/* Exercise card */
+.ex-card {
+  background: var(--fig-card);
+  border-radius: 12px;
+  overflow: hidden;
+  width: 100%;
+}
+
+/* Accordion header */
+.ex-accordion {
+  display: flex; align-items: center;
+  justify-content: space-between;
+  padding: 14px 16px 12px;
+  cursor: pointer; user-select: none;
+}
+.ex-accordion:active { background: #F5F0FF; }
+
+.ex-acc-left { flex: 1; }
+.ex-title { font-size: 16px; font-weight: 700; color: var(--fig-text); margin-bottom: 3px; }
+.ex-sub { font-size: 13px; color: var(--fig-sub); font-weight: 400; }
+.ex-sub.completado { font-weight: 700; color: var(--fig-text); }
+
+.ex-rir {
+  display: inline-block;
+  font-size: 11px; font-weight: 700;
+  color: var(--fig-btn);
+  margin-top: 2px;
+  letter-spacing: 0.04em;
+}
+.ex-rir.deload { color: #B8860B; }
+
+.ex-meta { font-size: 11px; color: var(--fig-sub); margin-top: 2px; }
+
+.chevron {
+  font-size: 14px; color: var(--fig-sub);
+  transition: transform 0.2s; padding: 4px; flex-shrink: 0;
+}
+.ex-card.open .chevron { transform: rotate(180deg); }
+.ex-card.all-done { border: 1.5px solid var(--fig-btn); }
+
+/* Accordion body */
+.ex-body {
+  display: none;
+  flex-direction: column;
+  gap: 8px;
+  padding: 0 16px 14px;
+}
+.ex-card.open .ex-body { display: flex; }
+
+/* Section labels */
+.fig-section-label {
+  font-size: 13px; color: var(--fig-sub);
+  font-weight: 400; padding: 0;
+}
+
+/* Warmup tag */
+.warmup-tag {
+  display: inline-block;
+  font-size: 11px; font-weight: 700;
+  color: #B45309;
+  background: #FEF3C7;
+  padding: 2px 8px; border-radius: 4px;
+  letter-spacing: 0.06em; text-transform: uppercase;
+}
+
+/* Sets header — mirrors row layout exactly */
+.sets-header {
+  display: flex; align-items: center;
+  padding: 0 8px 4px; gap: 32px;
+}
+.sh-s { width: 24px; flex-shrink: 0; font-size: 12px; font-weight: 500; color: var(--fig-sub); text-align: left; }
+.sh-col { width: 48px; flex-shrink: 0; font-size: 12px; font-weight: 500; color: var(--fig-sub); text-align: center; }
+.sh-rest { flex: 1; font-size: 12px; font-weight: 500; color: var(--fig-sub); text-align: center; }
+.sh-check { width: 26px; flex-shrink: 0; }
+
+/* Set row */
+.set-row {
+  display: flex; align-items: center;
+  padding: 8px; gap: 32px;
+  border-radius: 8px;
+  min-height: 48px; width: 100%;
+}
+.set-row.done-row { background: var(--fig-selected); }
+
+.set-num {
+  width: 24px; flex-shrink: 0;
+  font-size: 14px; color: var(--fig-text); font-weight: 400;
+}
+
+/* Inputs */
+.set-input {
+  width: 48px; height: 48px;
+  background: white;
+  border: 1.5px solid var(--fig-border);
+  border-radius: 8px; padding: 8px;
+  font-size: 15px; font-weight: 500;
+  text-align: center; color: var(--fig-text);
+  font-family: inherit; outline: none;
+  -webkit-appearance: none; appearance: none;
+  flex-shrink: 0; display: block;
+}
+.set-input:focus { border-color: var(--fig-bar); }
+.set-row.done-row .set-input { background: var(--fig-selected); border-color: transparent; }
+
+/* Hide spinners */
+input[type=number]::-webkit-inner-spin-button,
+input[type=number]::-webkit-outer-spin-button { -webkit-appearance: none; margin: 0; }
+input[type=number] { -moz-appearance: textfield; }
+
+.set-rest { flex: 1; font-size: 12px; color: var(--fig-text); text-align: center; line-height: 1.3; }
+
+/* Checkbox */
+.set-check {
+  width: 26px; height: 26px;
+  border: 2px solid #CCCCDD; border-radius: 6px;
+  display: flex; align-items: center; justify-content: center;
+  cursor: pointer; transition: all 0.15s;
+  background: white; flex-shrink: 0; margin-left: auto;
+}
+.set-check:active { transform: scale(0.88); }
+.set-check.checked { background: var(--fig-check); border-color: var(--fig-check); }
+.set-check.checked::after { content: '✓'; color: white; font-size: 14px; font-weight: 800; }
+
+/* Warmup checkbox — orange style */
+.set-check.warmup-chk { border-color: #D97706; background: white; }
+.set-check.warmup-chk.checked { background: #F59E0B; border-color: #F59E0B; }
+
+/* Rest post warmup */
+.rest-post-warmup {
+  display: flex; align-items: center; justify-content: space-between;
+  padding: 6px 0; border-top: 1px dashed var(--fig-divider);
+  border-bottom: 1px dashed var(--fig-divider);
+}
+.rpw-label { font-size: 11px; color: #D97706; font-weight: 600; }
+.rpw-chip { font-size: 12px; font-weight: 800; color: #D97706; background: #FEF3C7; padding: 3px 10px; border-radius: 20px; }
+
+/* Section divider */
+.sec-divider { height: 12px; }
+
+/* Rest next */
+.rest-next-text { font-size: 13px; color: var(--fig-sub); padding-top: 10px; border-top: 1px solid var(--fig-divider); }
+
+/* ══════════════════════════════════════════
+   MODALS
+══════════════════════════════════════════ */
+dialog { border-radius: 28px 28px 0 0; border: none; padding: 0; max-width: 480px; width: 100%; position: fixed; bottom: 0; top: auto; margin: 0 auto; background: var(--surface-container); color: var(--on-surface); }
+dialog::backdrop { background: rgba(0,0,0,0.65); }
+.sheet-wrap { padding: 12px 24px 44px; }
+.sheet-handle { width: 32px; height: 4px; background: var(--outline-dim); border-radius: 2px; margin: 0 auto 24px; }
+.sheet-icon { font-size: 48px; text-align: center; display: block; margin-bottom: 12px; }
+.sheet-title { font-size: 20px; font-weight: 800; text-align: center; margin-bottom: 8px; }
+.sheet-body { font-size: 14px; color: var(--on-surface-var); text-align: center; margin-bottom: 28px; line-height: 1.55; }
+.sheet-btns { display: flex; flex-direction: column; gap: 10px; }
+.btn-primary { padding: 16px; border-radius: 100px; border: none; background: var(--primary); color: var(--on-primary); font-size: 15px; font-weight: 700; cursor: pointer; font-family: inherit; }
+.btn-primary:active { opacity: 0.8; }
+.btn-danger { padding: 16px; border-radius: 100px; border: none; background: var(--danger-bg); color: var(--danger); font-size: 15px; font-weight: 700; cursor: pointer; font-family: inherit; }
+.btn-outline { padding: 15px; border-radius: 100px; border: 1.5px solid var(--outline); background: transparent; color: var(--on-surface); font-size: 15px; font-weight: 600; cursor: pointer; font-family: inherit; }
+
+/* ══════════════════════════════════════════
+   SNACKBAR + SYNC DOT
+══════════════════════════════════════════ */
+.snackbar { position: fixed; bottom: 28px; left: 50%; transform: translateX(-50%) translateY(120px); background: var(--on-surface); color: var(--surface); padding: 12px 22px; border-radius: 4px; font-size: 14px; font-weight: 700; z-index: 9999; white-space: nowrap; pointer-events: none; transition: transform 0.3s cubic-bezier(0.34,1.56,0.64,1); }
+.snackbar.show { transform: translateX(-50%) translateY(0); }
+.sync-dot { position: fixed; top: 14px; right: 14px; width: 8px; height: 8px; border-radius: 50%; background: var(--primary); z-index: 500; opacity: 0; transition: opacity 0.3s; }
+.sync-dot.show { opacity: 1; }
+</style>
+</head>
+<body>
+
+<div class="sync-dot" id="sync-dot"></div>
+<div class="snackbar" id="snackbar"></div>
+
+<!-- ══════════════════════════════════════════
+     SCREEN 0: PROFILE
+══════════════════════════════════════════ -->
+<div id="screen-profile" class="screen">
+  <div class="profile-logo">LINDI<span>GYM</span></div>
+  <div class="profile-tagline">¿Quién entrena hoy?</div>
+  <div class="profile-label">Selecciona tu perfil</div>
+  <div class="profile-cards">
+    <div class="profile-card" onclick="selectProfile('dani')">
+      <div class="profile-avatar">💪</div>
+      <div class="profile-name">DANI</div>
+      <div class="profile-sub">Aesthetic · 3 días</div>
+    </div>
+    <div class="profile-card" onclick="selectProfile('andrea')">
+      <div class="profile-avatar">🏋️</div>
+      <div class="profile-name">ANDREA</div>
+      <div class="profile-sub">Rodilla · 3 días</div>
+    </div>
+  </div>
+</div>
+
+<!-- ══════════════════════════════════════════
+     SCREEN 1: HOME
+══════════════════════════════════════════ -->
+<div id="screen-home" class="screen">
+  <div class="home-hero">
+    <div class="profile-badge" onclick="showScreen('profile')">← Cambiar perfil</div>
+    <div class="home-greeting">Tu mesociclo</div>
+    <div class="home-title">HOLA,<br><span id="home-name">DANI</span></div>
+    <div class="meso-card">
+      <div class="meso-card-label">Mesociclo activo</div>
+      <div class="meso-card-text" id="meso-desc"></div>
+    </div>
+  </div>
+  <div class="section-header">Semanas</div>
+  <div class="weeks-list" id="weeks-container"></div>
+  <button class="btn-reset" onclick="showModal('modal-reset')">↺ Reiniciar mesociclo</button>
+</div>
+
+<!-- ══════════════════════════════════════════
+     SCREEN 2: WEEK
+══════════════════════════════════════════ -->
+<div id="screen-week" class="screen">
+  <div class="top-bar-dark">
+    <button class="icon-btn" onclick="showScreen('home')">←</button>
+    <div class="bar-title-dark" id="week-bar-title">Semana</div>
+    <div style="width:40px"></div>
+  </div>
+  <div class="week-hero">
+    <div class="week-hero-title" id="week-title"></div>
+  </div>
+  <div class="days-list" id="days-container"></div>
+</div>
+
+<!-- ══════════════════════════════════════════
+     SCREEN 3: DAY — FIGMA UI
+══════════════════════════════════════════ -->
+<div id="screen-day" class="screen">
+  <div class="top-bar-fig">
+    <button class="fig-back-btn" id="day-back-btn">←</button>
+    <div class="fig-bar-title" id="day-bar-title">Día</div>
+    <button class="fig-complete-btn" onclick="showModal('modal-complete')">Completar</button>
+  </div>
+  <div class="day-progress">
+    <div class="progress-bar"><div class="progress-fill" id="progress-fill"></div></div>
+    <div class="progress-label" id="progress-label">0 series</div>
+  </div>
+  <div class="ex-list" id="exercises-container"></div>
+</div>
+
+<!-- ══════════════════════════════════════════
+     MODAL: COMPLETAR DÍA
+══════════════════════════════════════════ -->
+<dialog id="modal-complete">
+  <div class="sheet-wrap">
+    <div class="sheet-handle"></div>
+    <span class="sheet-icon">💪</span>
+    <div class="sheet-title">¿Completar este día?</div>
+    <div class="sheet-body">Los valores quedarán guardados y el día se marcará como completado.</div>
+    <div class="sheet-btns">
+      <button class="btn-primary" onclick="completeDay()">Sí, completar</button>
+      <button class="btn-outline" onclick="hideModal('modal-complete')">Cancelar</button>
+    </div>
+  </div>
+</dialog>
+
+<!-- ══════════════════════════════════════════
+     MODAL: REINICIAR
+══════════════════════════════════════════ -->
+<dialog id="modal-reset">
+  <div class="sheet-wrap">
+    <div class="sheet-handle"></div>
+    <span class="sheet-icon">↺</span>
+    <div class="sheet-title">¿Reiniciar mesociclo?</div>
+    <div class="sheet-body">Todos los días y semanas volverán a estar sin completar. Los pesos y repeticiones que tienes guardados se mantienen exactamente como los dejaste.</div>
+    <div class="sheet-btns">
+      <button class="btn-danger" onclick="resetMesociclo()">Sí, reiniciar</button>
+      <button class="btn-outline" onclick="hideModal('modal-reset')">Cancelar</button>
+    </div>
+  </div>
+</dialog>
+
+<script>
+// ════════════════════════════════════════
+// CONFIG
+// ════════════════════════════════════════
+const APPS_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbwKV1jwvji9phpv20vWDaStn5x_-xYaPJjtyWWr23l6kcTIvPSCtyzaTB8zCGUx_gVhJQ/exec';
+
+// ════════════════════════════════════════
+// DATA
+// ════════════════════════════════════════
+const WEEKS = [
+  { id:'w1', name:'SEMANA 1', isDeload:false },
+  { id:'w2', name:'SEMANA 2', isDeload:false },
+  { id:'w3', name:'SEMANA 3', isDeload:false },
+  { id:'w4', name:'SEMANA 4 — DELOAD', isDeload:true }
+];
+const DAYS = [
+  { id:'lunes',     name:'LUNES' },
+  { id:'miercoles', name:'MIÉRCOLES' },
+  { id:'viernes',   name:'VIERNES' }
+];
+
+// RIR per tipo per week
+const RIR_MAP = {
+  compound:    { w1:2, w2:1, w3:1, w4:5 },
+  intermediate:{ w1:2, w2:1, w3:1, w4:5 },
+  isolation:   { w1:1, w2:1, w3:0, w4:5 }
+};
+function getRIR(tipo, weekId) { return RIR_MAP[tipo][weekId]; }
+
+const EX_META = {
+  leg_press:       { icon:'🦵', muscle:'Pierna',         tipo:'compound' },
+  bench_db:        { icon:'🏋️', muscle:'Pecho',          tipo:'compound' },
+  rdl:             { icon:'🔗', muscle:'Isquiotibiales', tipo:'intermediate' },
+  jalon:           { icon:'🔙', muscle:'Espalda',        tipo:'compound' },
+  laterales_l:     { icon:'💪', muscle:'Hombro',         tipo:'isolation' },
+  curl_l:          { icon:'💪', muscle:'Bíceps',         tipo:'isolation' },
+  press_incl_db_m: { icon:'📐', muscle:'Pecho',          tipo:'intermediate' },
+  leg_ext:         { icon:'🦵', muscle:'Pierna',         tipo:'isolation' },
+  ohp_db:          { icon:'🔝', muscle:'Hombro',         tipo:'compound' },
+  leg_curl_m:      { icon:'🔗', muscle:'Isquiotibiales', tipo:'isolation' },
+  cable_row:       { icon:'🔙', muscle:'Espalda',        tipo:'intermediate' },
+  laterales_m:     { icon:'💪', muscle:'Hombro',         tipo:'isolation' },
+  dominadas:       { icon:'⬆️', muscle:'Espalda',        tipo:'compound' },
+  leg_curl_v:      { icon:'🔗', muscle:'Isquiotibiales', tipo:'isolation' },
+  press_incl_db_v: { icon:'📐', muscle:'Pecho',          tipo:'intermediate' },
+  laterales_v:     { icon:'💪', muscle:'Hombro',         tipo:'isolation' },
+  curl_v:          { icon:'💪', muscle:'Bíceps',         tipo:'isolation' },
+  triceps:         { icon:'💪', muscle:'Tríceps',        tipo:'isolation' }
+};
+
+// ════════════════════════════════════════
+// DANI BASE EXERCISES
+// ════════════════════════════════════════
+const DANI_BASE = {
+  lunes: [
+    { id:'leg_press', name:'Leg Press',
+      warmup:[{kg:60,reps:8,rest:'1:00'},{kg:85,reps:5,rest:'1:00'}], restPostWarmup:'2:00',
+      sets:[{kg:105,reps:10},{kg:105,reps:10},{kg:105,reps:10},{kg:105,reps:10}],
+      restBetween:'2:30', restNext:'3:00' },
+    { id:'bench_db', name:'Bench Press DB',
+      warmup:[{kg:15,reps:8,rest:'1:00'}], restPostWarmup:'1:30',
+      sets:[{kg:25,reps:8},{kg:25,reps:8},{kg:25,reps:8},{kg:25,reps:8}],
+      restBetween:'2:00', restNext:'2:30' },
+    { id:'rdl', name:'RDL Mancuernas',
+      warmup:[{kg:14,reps:8,rest:'1:00'}], restPostWarmup:'1:30',
+      sets:[{kg:22,reps:12},{kg:22,reps:12},{kg:22,reps:12}],
+      restBetween:'1:30', restNext:'2:00' },
+    { id:'jalon', name:'Jalón al pecho',
+      warmup:[{kg:30,reps:8,rest:'1:00'}], restPostWarmup:'1:30',
+      sets:[{kg:45,reps:10},{kg:45,reps:10},{kg:45,reps:10},{kg:45,reps:10}],
+      restBetween:'2:00', restNext:'2:30' },
+    { id:'laterales_l', name:'Laterales DB',
+      warmup:[], restPostWarmup:null,
+      sets:[{kg:8,reps:15},{kg:8,reps:15},{kg:8,reps:15}],
+      restBetween:'1:00', restNext:'1:30' },
+    { id:'curl_l', name:'Curl Bíceps DB',
+      warmup:[], restPostWarmup:null,
+      sets:[{kg:12,reps:12},{kg:12,reps:12}],
+      restBetween:'1:00', restNext:null }
+  ],
+  miercoles: [
+    { id:'press_incl_db_m', name:'Press Inclinado DB',
+      warmup:[{kg:12,reps:8,rest:'1:00'}], restPostWarmup:'1:30',
+      sets:[{kg:20,reps:10},{kg:20,reps:10},{kg:20,reps:10},{kg:20,reps:10}],
+      restBetween:'2:00', restNext:'2:30' },
+    { id:'leg_ext', name:'Leg Extension',
+      warmup:[{kg:25,reps:10,rest:'1:00'}], restPostWarmup:'1:30',
+      sets:[{kg:42,reps:14},{kg:42,reps:14},{kg:42,reps:14}],
+      restBetween:'1:30', restNext:'2:00' },
+    { id:'ohp_db', name:'Overhead Press DB sentado',
+      warmup:[{kg:10,reps:8,rest:'1:00'}], restPostWarmup:'1:30',
+      sets:[{kg:17,reps:10},{kg:17,reps:10},{kg:17,reps:10},{kg:17,reps:10}],
+      restBetween:'2:00', restNext:'2:30' },
+    { id:'leg_curl_m', name:'Lying Leg Curl',
+      warmup:[{kg:20,reps:8,rest:'1:00'}], restPostWarmup:'1:30',
+      sets:[{kg:32,reps:12},{kg:32,reps:12},{kg:32,reps:12}],
+      restBetween:'1:30', restNext:'2:00' },
+    { id:'cable_row', name:'Seated Cable Row',
+      warmup:[{kg:25,reps:8,rest:'1:00'}], restPostWarmup:'1:30',
+      sets:[{kg:40,reps:10},{kg:40,reps:10},{kg:40,reps:10},{kg:40,reps:10}],
+      restBetween:'2:00', restNext:'2:30' },
+    { id:'laterales_m', name:'Laterales DB',
+      warmup:[], restPostWarmup:null,
+      sets:[{kg:8,reps:15},{kg:8,reps:15},{kg:8,reps:15}],
+      restBetween:'1:00', restNext:null }
+  ],
+  viernes: [
+    { id:'dominadas', name:'Dominadas',
+      warmup:[{kg:0,reps:3,rest:'1:00'},{kg:0,reps:4,rest:'1:00'}], restPostWarmup:'2:00',
+      sets:[{kg:0,reps:8},{kg:0,reps:8},{kg:0,reps:8}],
+      restBetween:'2:30', restNext:'3:00', isBW:true },
+    { id:'leg_curl_v', name:'Lying Leg Curl',
+      warmup:[{kg:20,reps:8,rest:'1:00'}], restPostWarmup:'1:30',
+      sets:[{kg:32,reps:12},{kg:32,reps:12},{kg:32,reps:12}],
+      restBetween:'1:30', restNext:'2:00' },
+    { id:'press_incl_db_v', name:'Press Inclinado DB',
+      warmup:[{kg:12,reps:8,rest:'1:00'}], restPostWarmup:'1:30',
+      sets:[{kg:20,reps:10},{kg:20,reps:10},{kg:20,reps:10},{kg:20,reps:10}],
+      restBetween:'2:00', restNext:'2:30' },
+    { id:'laterales_v', name:'Laterales DB',
+      warmup:[], restPostWarmup:null,
+      sets:[{kg:8,reps:15},{kg:8,reps:15},{kg:8,reps:15}],
+      restBetween:'1:00', restNext:'1:00' },
+    { id:'curl_v', name:'Curl Bíceps DB',
+      warmup:[], restPostWarmup:null,
+      sets:[{kg:12,reps:12},{kg:12,reps:12}],
+      restBetween:'1:00', restNext:'0:45' },
+    { id:'triceps', name:'Tríceps sobre cabeza DB',
+      warmup:[], restPostWarmup:null,
+      sets:[{kg:16,reps:12},{kg:16,reps:12}],
+      restBetween:'0:45', restNext:null }
+  ]
+};
+
+const W3_EXTRA = {
+  lunes:    { leg_press:5, bench_db:5, jalon:5 },
+  miercoles:{ press_incl_db_m:5, ohp_db:5, cable_row:5 },
+  viernes:  { dominadas:4, press_incl_db_v:5 }
+};
+
+function makeDeload(base) {
+  const d = JSON.parse(JSON.stringify(base));
+  Object.keys(d).forEach(day => {
+    d[day].forEach(ex => {
+      ex.sets = ex.sets.slice(0, Math.max(2, ex.sets.length - 1)).map(s => ({...s, kg: Math.round(s.kg * 0.7)}));
+      ex.warmup = ex.warmup.slice(0, 1);
+    });
+  });
+  return d;
+}
+
+const DANI_DELOAD = makeDeload(DANI_BASE);
+const ANDREA_BASE = DANI_BASE;
+const ANDREA_DELOAD = DANI_DELOAD;
+
+function getExercises(profile, dayId, weekId) {
+  const week = WEEKS.find(w => w.id === weekId);
+  const base = profile === 'dani' ? DANI_BASE : ANDREA_BASE;
+  const deload = profile === 'dani' ? DANI_DELOAD : ANDREA_DELOAD;
+  if (week.isDeload) return JSON.parse(JSON.stringify(deload[dayId]));
+  const exs = JSON.parse(JSON.stringify(base[dayId]));
+  if (weekId === 'w3') {
+    const extra = W3_EXTRA[dayId] || {};
+    exs.forEach(ex => {
+      if (extra[ex.id]) while (ex.sets.length < extra[ex.id]) ex.sets.push({...ex.sets[ex.sets.length-1]});
+    });
+  }
+  return exs;
+}
+
+// ════════════════════════════════════════
+// STATE
+// ════════════════════════════════════════
+let appState = null, currentProfile = null, currentWeekId = null, currentDayId = null;
+let checkedSets = {}, totalWorkSets = 0;
+
+function createDefaultState(profile) {
+  const state = { weeks:{} };
+  WEEKS.forEach(week => {
+    state.weeks[week.id] = { completed:false, days:{} };
+    DAYS.forEach(day => {
+      const exs = getExercises(profile, day.id, week.id);
+      state.weeks[week.id].days[day.id] = { completed:false, exercises:{} };
+      exs.forEach(ex => {
+        state.weeks[week.id].days[day.id].exercises[ex.id] = {
+          warmup: ex.warmup.map(w=>({...w})),
+          sets: ex.sets.map(s=>({...s})),
+          restBetween: ex.restBetween,
+          restNext: ex.restNext,
+          restPostWarmup: ex.restPostWarmup
+        };
+      });
+    });
+  });
+  return state;
+}
+
+function mergeState(def, saved) {
+  if (!saved || !saved.weeks) return def;
+  Object.keys(def.weeks).forEach(wId => {
+    if (!saved.weeks[wId]) return;
+    def.weeks[wId].completed = saved.weeks[wId].completed || false;
+    Object.keys(def.weeks[wId].days).forEach(dId => {
+      if (!saved.weeks[wId].days?.[dId]) return;
+      const sd = saved.weeks[wId].days[dId];
+      def.weeks[wId].days[dId].completed = sd.completed || false;
+      if (!sd.exercises) return;
+      Object.keys(def.weeks[wId].days[dId].exercises).forEach(eId => {
+        if (!sd.exercises[eId]) return;
+        const se = sd.exercises[eId], de = def.weeks[wId].days[dId].exercises[eId];
+        if (se.sets) de.sets = de.sets.map((s,i) => se.sets[i] ? {...se.sets[i]} : s);
+        if (se.warmup) de.warmup = de.warmup.map((w,i) => se.warmup[i] ? {...se.warmup[i]} : w);
+        if (se.restBetween !== undefined) de.restBetween = se.restBetween;
+        if (se.restNext !== undefined) de.restNext = se.restNext;
+        if (se.restPostWarmup !== undefined) de.restPostWarmup = se.restPostWarmup;
+      });
+    });
+  });
+  return def;
+}
+
+// ════════════════════════════════════════
+// PERSISTENCE
+// ════════════════════════════════════════
+let syncTimer = null;
+function stateKey(p) { return 'lindigym_' + p + '_v5'; }
+
+function saveState() {
+  if (!currentProfile || !appState) return;
+  localStorage.setItem(stateKey(currentProfile), JSON.stringify(appState));
+  clearTimeout(syncTimer);
+  syncTimer = setTimeout(syncToSheets, 1500);
+}
+
+async function syncToSheets() {
+  const dot = document.getElementById('sync-dot');
+  try {
+    dot.classList.add('show');
+    await fetch(APPS_SCRIPT_URL, { method:'POST', body: JSON.stringify({ sheet: currentProfile === 'dani' ? 'Dani' : 'Andrea', state: appState }) });
+    setTimeout(() => dot.classList.remove('show'), 1000);
+  } catch(e) { dot.classList.remove('show'); }
+}
+
+async function loadState(profile) {
+  const def = createDefaultState(profile);
+  try {
+    const local = localStorage.getItem(stateKey(profile));
+    if (local) { appState = mergeState(def, JSON.parse(local)); return; }
+  } catch(e) {}
+  try {
+    const r = await fetch(APPS_SCRIPT_URL + '?sheet=' + (profile === 'dani' ? 'Dani' : 'Andrea') + '&t=' + Date.now());
+    const result = await r.json();
+    if (result.success && result.data) { appState = mergeState(def, result.data); return; }
+  } catch(e) {}
+  appState = def;
+}
+
+// ════════════════════════════════════════
+// NAVIGATION
+// ════════════════════════════════════════
+function showScreen(id) {
+  document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+  const s = document.getElementById('screen-' + id);
+  if (s) { s.classList.add('active'); window.scrollTo(0,0); }
+}
+
+// ════════════════════════════════════════
+// PROFILE
+// ════════════════════════════════════════
+async function selectProfile(profile) {
+  currentProfile = profile;
+  await loadState(profile);
+  renderHome(profile);
+  showScreen('home');
+}
+
+function renderHome(profile) {
+  document.getElementById('home-name').textContent = profile === 'dani' ? 'DANI' : 'ANDREA';
+  document.getElementById('meso-desc').textContent = profile === 'dani'
+    ? 'Hipertrofia aesthetic · 4 semanas · Lunes, Miércoles y Viernes · Completa las 4 semanas y reinicia para el siguiente bloque.'
+    : 'Fortalecimiento post rodilla · 4 semanas · Lunes, Miércoles y Viernes · Prioridad glúteo y estabilidad.';
+  const c = document.getElementById('weeks-container');
+  c.innerHTML = '';
+  WEEKS.forEach(week => {
+    const ws = appState.weeks[week.id];
+    const div = document.createElement('div');
+    div.className = 'week-row' + (ws.completed?' done':'') + (week.isDeload?' deload':'');
+    div.innerHTML = `
+      <div class="week-check ${ws.completed?'done':''}">${ws.completed?'✓':''}</div>
+      <div class="week-info">
+        <div class="week-name">${week.name}</div>
+        <div class="week-sub">${week.isDeload?'RIR 5 · Recuperación activa':'Entrena y progresa'}</div>
+      </div>
+      <div class="week-arrow">›</div>`;
+    div.onclick = () => showWeek(week.id);
+    c.appendChild(div);
+  });
+}
+
+// ════════════════════════════════════════
+// WEEK
+// ════════════════════════════════════════
+function showWeek(weekId) {
+  currentWeekId = weekId;
+  const week = WEEKS.find(w => w.id === weekId);
+  document.getElementById('week-bar-title').textContent = week.name;
+  document.getElementById('week-title').textContent = week.name;
+  const c = document.getElementById('days-container');
+  c.innerHTML = '';
+  DAYS.forEach(day => {
+    const ds = appState.weeks[weekId].days[day.id];
+    const div = document.createElement('div');
+    div.className = 'day-row' + (ds.completed?' done':'');
+    div.innerHTML = `
+      <div class="day-check ${ds.completed?'done':''}">${ds.completed?'✓':''}</div>
+      <div style="flex:1">
+        <div class="day-name">${day.name}</div>
+        <div class="day-sub">${week.isDeload?'DELOAD · RIR 5':'RIR por ejercicio'}</div>
+      </div>
+      <div class="week-arrow">›</div>`;
+    div.onclick = () => showDay(weekId, day.id);
+    c.appendChild(div);
+  });
+  showScreen('week');
+}
+
+// ════════════════════════════════════════
+// DAY
+// ════════════════════════════════════════
+function showDay(weekId, dayId) {
+  currentWeekId = weekId;
+  currentDayId = dayId;
+  checkedSets = {};
+  totalWorkSets = 0;
+  const day = DAYS.find(d => d.id === dayId);
+  document.getElementById('day-bar-title').textContent = day.name;
+  document.getElementById('day-back-btn').onclick = () => showWeek(weekId);
+  renderExercises(weekId, dayId);
+  showScreen('day');
+}
+
+function renderExercises(weekId, dayId) {
+  const week = WEEKS.find(w => w.id === weekId);
+  const exs = getExercises(currentProfile, dayId, weekId);
+  const dayState = appState.weeks[weekId].days[dayId];
+  const c = document.getElementById('exercises-container');
+  c.innerHTML = '';
+
+  totalWorkSets = 0;
+  exs.forEach(ex => { totalWorkSets += ex.sets.length; checkedSets[ex.id] = 0; });
+  updateProgress();
+
+  exs.forEach((ex, exIdx) => {
+    const es = dayState.exercises[ex.id];
+    if (!es) return;
+    const isBW = ex.isBW || false;
+    const meta = EX_META[ex.id] || { icon:'💪', muscle:'', tipo:'compound' };
+    const rir = getRIR(meta.tipo, weekId);
+    const totalS = ex.sets.length;
+    const doneCount = checkedSets[ex.id] || 0;
+
+    const card = document.createElement('div');
+    card.className = 'ex-card' + (exIdx === 0 ? ' open' : '');
+    card.id = 'card-' + ex.id;
+
+    // ── HEADER ──
+    let html = `
+      <div class="ex-accordion" onclick="toggleCard('${ex.id}')">
+        <div class="ex-acc-left">
+          <div class="ex-title">${ex.name}${isBW?' <span style="font-size:12px;color:var(--fig-sub);font-weight:400">· Peso corporal</span>':''}</div>
+          <div class="ex-rir${week.isDeload?' deload':''}">${week.isDeload ? 'DELOAD · RIR 5' : 'RIR ' + rir}</div>
+          <div class="ex-meta" id="meta-${ex.id}">${doneCount} / ${totalS} series</div>
+        </div>
+        <div class="chevron">▾</div>
+      </div>
+      <div class="ex-body">`;
+
+    // ── WARMUP ──
+    if (es.warmup && es.warmup.length > 0) {
+      html += `<div class="warmup-tag">Calentamiento</div>
+        <div class="sets-header">
+          <div class="sh-s">S</div>
+          <div class="sh-col">KG</div>
+          <div class="sh-col">REPS</div>
+          <div class="sh-rest">REST</div>
+          <div class="sh-check"></div>
+        </div>`;
+
+      es.warmup.forEach((w, i) => {
+        const kgVal = isBW && w.kg === 0 ? '' : w.kg;
+        html += `<div class="set-row" id="wrow-${ex.id}-${i}">
+          <div class="set-num">${i+1}</div>
+          <input type="number" inputmode="decimal" class="set-input" value="${kgVal}" placeholder="${isBW?'PC':'kg'}"
+            onchange="updateWarmup('${weekId}','${dayId}','${ex.id}',${i},'kg',this.value)">
+          <input type="number" inputmode="numeric" class="set-input" value="${w.reps}"
+            onchange="updateWarmup('${weekId}','${dayId}','${ex.id}',${i},'reps',this.value)">
+          <div class="set-rest">${w.rest}</div>
+          <div class="set-check warmup-chk" onclick="this.classList.toggle('checked')"></div>
+        </div>`;
+      });
+
+      if (es.restPostWarmup) {
+        html += `<div class="rest-post-warmup">
+          <span class="rpw-label">⏳ Descanso antes de empezar</span>
+          <span class="rpw-chip">${es.restPostWarmup}</span>
+        </div>`;
+      }
+
+      html += `<div class="sec-divider"></div>`;
+    }
+
+    // ── WORK SETS ──
+    html += `<div class="fig-section-label">Series de trabajo</div>
+      <div class="sets-header">
+        <div class="sh-s">S</div>
+        <div class="sh-col">KG</div>
+        <div class="sh-col">REPS</div>
+        <div class="sh-rest">REST</div>
+        <div class="sh-check"></div>
+      </div>`;
+
+    es.sets.forEach((set, i) => {
+      const kgVal = isBW && set.kg === 0 ? '' : set.kg;
+      html += `<div class="set-row" id="row-${ex.id}-${i}">
+        <div class="set-num">${i+1}</div>
+        <input type="number" inputmode="decimal" class="set-input" value="${kgVal}" placeholder="${isBW?'PC':'kg'}"
+          onchange="updateSet('${weekId}','${dayId}','${ex.id}',${i},'kg',this.value)">
+        <input type="number" inputmode="numeric" class="set-input" value="${set.reps}"
+          onchange="updateSet('${weekId}','${dayId}','${ex.id}',${i},'reps',this.value)">
+        <div class="set-rest">${es.restBetween}</div>
+        <div class="set-check" id="chk-${ex.id}-${i}" onclick="toggleCheck('${ex.id}',${i},'${weekId}','${dayId}')"></div>
+      </div>`;
+    });
+
+    if (es.restNext) {
+      html += `<div class="rest-next-text">Descansa ${es.restNext} antes del siguiente ejercicio</div>`;
+    }
+
+    html += `</div>`; // ex-body
+    card.innerHTML = html;
+    c.appendChild(card);
+  });
+}
+
+// ════════════════════════════════════════
+// ACCORDION
+// ════════════════════════════════════════
+function toggleCard(exId) {
+  document.getElementById('card-' + exId).classList.toggle('open');
+}
+
+// ════════════════════════════════════════
+// CHECKBOXES
+// ════════════════════════════════════════
+function toggleCheck(exId, setIdx, weekId, dayId) {
+  const el = document.getElementById('chk-'+exId+'-'+setIdx);
+  const row = document.getElementById('row-'+exId+'-'+setIdx);
+  const isDone = el.classList.contains('checked');
+
+  if (isDone) {
+    el.classList.remove('checked');
+    row.classList.remove('done-row');
+    checkedSets[exId] = Math.max(0, (checkedSets[exId]||0) - 1);
+  } else {
+    el.classList.add('checked');
+    row.classList.add('done-row');
+    checkedSets[exId] = (checkedSets[exId]||0) + 1;
+  }
+
+  const exs = getExercises(currentProfile, dayId, weekId);
+  const ex = exs.find(e => e.id === exId);
+  const total = ex ? ex.sets.length : 0;
+  const done = checkedSets[exId];
+  const meta = document.getElementById('meta-'+exId);
+  if (meta) {
+    meta.textContent = done + ' / ' + total + ' series';
+    meta.style.color = done === total ? 'var(--fig-btn)' : 'var(--fig-sub)';
+  }
+
+  if (done === total && total > 0) {
+    const card = document.getElementById('card-'+exId);
+    card.classList.add('all-done');
+    setTimeout(() => {
+      card.classList.remove('open');
+      const idx = exs.findIndex(e => e.id === exId);
+      const next = exs[idx+1];
+      if (next) document.getElementById('card-'+next.id).classList.add('open');
+    }, 350);
+  } else {
+    document.getElementById('card-'+exId)?.classList.remove('all-done');
+  }
+
+  updateProgress();
+}
+
+function updateProgress() {
+  const total = totalWorkSets;
+  const done = Object.values(checkedSets).reduce((a,b)=>a+b,0);
+  const pct = total > 0 ? Math.round((done/total)*100) : 0;
+  document.getElementById('progress-fill').style.width = pct + '%';
+  document.getElementById('progress-label').textContent = done + ' / ' + total + ' series';
+}
+
+// ════════════════════════════════════════
+// STATE UPDATES
+// ════════════════════════════════════════
+function updateSet(wId,dId,eId,idx,field,val) {
+  const v = field==='kg' ? parseFloat(val) : parseInt(val);
+  if (!isNaN(v)) { appState.weeks[wId].days[dId].exercises[eId].sets[idx][field] = v; saveState(); }
+}
+function updateWarmup(wId,dId,eId,idx,field,val) {
+  const v = field==='kg' ? parseFloat(val) : parseInt(val);
+  if (!isNaN(v)) { appState.weeks[wId].days[dId].exercises[eId].warmup[idx][field] = v; saveState(); }
+}
+
+// ════════════════════════════════════════
+// COMPLETE + RESET
+// ════════════════════════════════════════
+function completeDay() {
+  hideModal('modal-complete');
+  appState.weeks[currentWeekId].days[currentDayId].completed = true;
+  if (DAYS.every(d => appState.weeks[currentWeekId].days[d.id].completed)) appState.weeks[currentWeekId].completed = true;
+  saveState();
+  toast('💪 ' + DAYS.find(d => d.id === currentDayId).name + ' completado');
+  setTimeout(() => { showWeek(currentWeekId); renderHome(currentProfile); }, 1200);
+}
+
+function resetMesociclo() {
+  hideModal('modal-reset');
+  WEEKS.forEach(w => { appState.weeks[w.id].completed = false; DAYS.forEach(d => { appState.weeks[w.id].days[d.id].completed = false; }); });
+  saveState();
+  renderHome(currentProfile);
+  toast('↺ Mesociclo reiniciado');
+}
+
+// ════════════════════════════════════════
+// MODALS + TOAST
+// ════════════════════════════════════════
+function showModal(id) { document.getElementById(id).showModal(); }
+function hideModal(id) { document.getElementById(id).close(); }
+document.querySelectorAll('dialog').forEach(d => { d.addEventListener('click', e => { if (e.target===d) d.close(); }); });
+
+function toast(msg) {
+  const el = document.getElementById('snackbar');
+  el.textContent = msg; el.classList.add('show');
+  setTimeout(() => el.classList.remove('show'), 2400);
+}
+
+// ════════════════════════════════════════
+// INIT
+// ════════════════════════════════════════
+function init() { showScreen('profile'); }
+init();
+</script>
+</body>
+</html>
