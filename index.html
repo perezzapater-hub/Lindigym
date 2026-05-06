@@ -1,0 +1,612 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
+  <meta name="apple-mobile-web-app-capable" content="yes" />
+  <title>LindTrack</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Google+Sans:ital,opsz,wght@0,17..18,400..700;1,17..18,400..700&family=Zalando+Sans+Expanded&display=swap" rel="stylesheet" />
+  <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Rounded:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200&display=swap" rel="stylesheet" />
+  <style>
+    *{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
+    :root{--bg:#171a2c;--surface:#292c40;--surface-3:#1f2031;--text:#fff;--detail:#5C617F;--inactive:#5C617F;--accent:#235FE3;--danger:#FF4D4D;--track:rgba(255,255,255,.1);--page-x:16px;--display-text-size:56px;--set-input-width:108px;--set-rest-width:56px;--set-control-size:67px;--diet-value-width:108px;--ease:cubic-bezier(.22,1,.36,1)}
+    html,body{width:100%;height:100%;max-width:480px;margin:0 auto;overflow:hidden;background:var(--bg);color:var(--text);font-family:'Google Sans',sans-serif;-webkit-font-smoothing:antialiased}
+    button,input{font:inherit}button{border:0;background:transparent;color:inherit;cursor:pointer}input{border:0;outline:none;background:transparent}.icon{font-family:'Material Symbols Rounded';font-size:24px;line-height:24px;width:24px;height:24px;display:inline-flex;align-items:center;justify-content:center;font-feature-settings:'liga'}button:active{opacity:.72}
+    .app-shell{position:relative;width:100%;height:100dvh;overflow:hidden;background:var(--bg)}.screen{position:absolute;inset:0;display:flex;flex-direction:column;width:100%;height:100dvh;overflow-y:auto;-webkit-overflow-scrolling:touch;background:var(--bg);opacity:0;transform:translateX(100%);pointer-events:none;transition:transform 260ms var(--ease),opacity 180ms ease;overscroll-behavior:contain}.screen.active{opacity:1;transform:translateX(0);pointer-events:auto;z-index:2}.screen.from-left{transform:translateX(-100%)}
+    .nav-bar{flex-shrink:0;display:flex;align-items:center;justify-content:space-between;height:88px;min-height:88px;padding:16px var(--page-x);gap:12px;position:sticky;top:0;z-index:100;background:transparent}.back-btn{width:56px;height:56px;min-width:56px;min-height:56px;background:var(--surface-3);border-radius:100%;display:flex;align-items:center;justify-content:center}.nav-title{position:absolute;left:50%;transform:translateX(-50%);max-width:180px;font-size:14px;font-weight:700;line-height:1;text-align:center;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;pointer-events:none}.nav-spacer{width:56px;height:56px;flex:0 0 56px}.nav-cta,.nav-reset{height:56px;min-height:56px;border-radius:32px;padding:0 20px;font-size:14px;font-weight:700;white-space:nowrap}.nav-cta{background:var(--surface-3);color:var(--accent)}.nav-reset{background:var(--surface-3);color:var(--danger)}
+    .display-text{font-family:'Zalando Sans Expanded','Google Sans',sans-serif;font-size:var(--display-text-size);line-height:.98;font-weight:400;letter-spacing:-1px;white-space:nowrap}.detail-text{color:var(--detail);font-size:14px;line-height:1;font-weight:700}.brand{height:88px;min-height:88px;padding:30px var(--page-x) 0}.brand-title,.brand-copy{font-size:14px;line-height:1;font-weight:700}.brand-title{margin-bottom:14px}.brand-copy{color:var(--detail)}
+    .home-profiles{flex:1;display:flex;flex-direction:column;justify-content:flex-end;gap:16px;padding:0 var(--page-x) 16px;min-height:0;overflow:hidden}.profile-item{position:relative}.profile-trigger{position:relative;width:100%;min-height:56px;max-height:72px;display:flex;align-items:center;text-align:left;overflow:hidden}.profile-panel{max-height:0;opacity:0;overflow:hidden;pointer-events:none;margin-top:0;transition:max-height 520ms var(--ease),margin-top 520ms var(--ease),opacity 520ms ease}.profile-item.is-open .profile-panel{max-height:240px;opacity:1;pointer-events:auto;margin-top:16px}.profile-sections{display:flex;flex-direction:column;gap:16px}.profile-section-btn{min-height:56px;display:flex;align-items:center;text-align:left;overflow:visible;padding:0}.profile-section-btn.display-text,.profile-trigger .display-text{white-space:nowrap;overflow:visible;word-break:normal;line-height:.98;padding-bottom:0}.profile-item.is-open .profile-name{color:var(--accent)!important;-webkit-text-fill-color:var(--accent)!important}.profile-item.is-inactive .profile-name,.profile-item.is-inactive .section-label{color:var(--inactive)!important;-webkit-text-fill-color:var(--inactive)!important}
+    .tabs{display:flex;align-items:center;gap:32px;padding:32px var(--page-x) 0}.tab-btn{font-size:14px;line-height:1;font-weight:700;color:var(--detail)}.tab-btn.is-active{color:var(--text)}.diet-days-viewport{position:relative;flex:1;min-height:0;overflow:hidden}.diet-days-panel{position:absolute;inset:0;display:flex;flex-direction:column;justify-content:flex-end;gap:16px;padding:0 var(--page-x) 16px;min-height:0;will-change:transform;transition:transform 320ms var(--ease),opacity 260ms ease}.big-list{flex:1;display:flex;flex-direction:column;justify-content:flex-end;gap:16px;padding:0 var(--page-x) 16px;min-height:0;overflow:hidden}.diet-summary{grid-template-columns:1fr}.diet-summary .summary-title,.diet-summary .summary-detail{grid-column:1}.big-option{position:relative;width:100%;min-height:56px;display:flex;align-items:center;text-align:left;overflow:hidden}.big-option.is-empty .display-text,.big-option.is-empty .detail-text{color:var(--inactive);-webkit-text-fill-color:var(--inactive)}.option-detail{position:absolute;right:0;top:50%;transform:translateY(-50%)}
+    .summary{display:grid;grid-template-columns:1fr auto;grid-template-rows:auto auto;align-items:center;column-gap:16px;row-gap:4px;padding:32px var(--page-x) 16px}.summary-meta{display:contents}.summary-title{grid-column:1;grid-row:1;color:var(--text);font-size:14px;line-height:1;font-weight:700}.summary-detail{grid-column:1;grid-row:2;color:var(--detail);font-size:14px;line-height:1;font-weight:700}.progressbar{position:relative;grid-column:2;grid-row:2;width:56px;height:4px}.progressbar-track,.progressbar-fill{position:absolute;top:0;left:0;height:4px;border-radius:999px}.progressbar-track{width:100%;background:var(--track)}.progressbar-fill{width:0%;background:#fff;transition:width 260ms var(--ease)}
+    .detail-content{flex:1 0 auto;display:flex;flex-direction:column;padding:0 var(--page-x) 16px}.detail-heading{padding:32px 0 16px}.detail-top{display:grid;grid-template-columns:1fr auto;grid-template-rows:auto auto;align-items:center;column-gap:16px;row-gap:4px}.detail-kicker{grid-column:1;grid-row:1;color:var(--detail);font-size:14px;line-height:1;font-weight:700}.detail-title-small{grid-column:1;grid-row:2;color:var(--text);font-size:14px;line-height:1;font-weight:700}.empty-state{padding:160px var(--page-x) 16px;color:var(--inactive);font-size:14px;font-weight:700;line-height:1.4}
+    .diet-food-table{margin-top:auto;width:100%;padding-top:64px}.diet-food-head{display:grid;grid-template-columns:minmax(0,1fr) minmax(96px,max-content) 24px minmax(96px,max-content);align-items:end;margin-bottom:16px}.diet-food-head span{color:var(--text);font-size:12px;font-weight:500;text-transform:uppercase;text-align:right;line-height:1.05;justify-self:end}.diet-food-head span:nth-child(1){grid-column:2}.diet-food-head span:nth-child(2){grid-column:4}.diet-food-rows{display:flex;flex-direction:column}.diet-food-row{display:grid;grid-template-columns:minmax(0,1fr) minmax(96px,max-content) 24px minmax(96px,max-content);align-items:center;width:100%;height:67px}.diet-food-name{grid-column:1;min-width:0;color:var(--text);font-size:14px;line-height:1.1;font-weight:500;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;padding-right:12px}.diet-food-value{height:67px;color:var(--text);font-size:var(--display-text-size);line-height:67px;text-align:right;white-space:nowrap;overflow:visible;font-weight:400;justify-self:end}.diet-food-value.raw{grid-column:2;color:var(--inactive);-webkit-text-fill-color:var(--inactive)}.diet-food-value.cooked{grid-column:4;color:var(--text);-webkit-text-fill-color:var(--text)}
+    .weeks-list{flex:1;display:flex;flex-direction:column;justify-content:flex-end;gap:16px;padding:0 var(--page-x) 16px;min-height:0;overflow:hidden}.week-item{position:relative}.week-trigger{position:relative;width:100%;min-height:56px;max-height:72px;display:flex;align-items:center;text-align:left;overflow:hidden}.week-title{max-width:calc(100% - 72px)}.week-detail{position:absolute;right:0;top:50%;transform:translateY(-50%);color:var(--detail)}.week-detail.is-empty{display:none}.week-panel{max-height:0;opacity:0;overflow:hidden;pointer-events:none;margin-top:0;transition:max-height 520ms var(--ease),margin-top 520ms var(--ease),opacity 520ms ease}.week-item.is-open .week-panel{max-height:240px;opacity:1;pointer-events:auto;margin-top:16px}.week-days{display:flex;flex-direction:column;gap:16px}.week-day-btn{min-height:56px;display:flex;align-items:center;text-align:left}.week-item.is-open .week-title{color:var(--accent)!important;-webkit-text-fill-color:var(--accent)!important}.week-item.is-inactive .display-text,.week-item.is-inactive .detail-text{color:var(--inactive)!important;-webkit-text-fill-color:var(--inactive)!important}.is-done .display-text,.week-day-btn.is-done,.is-complete .exercise-title{color:var(--inactive)!important;-webkit-text-fill-color:var(--inactive)!important;text-decoration-line:line-through;text-decoration-thickness:4px;text-decoration-color:currentColor}
+    .exercise-screen-content{flex:1 0 auto;display:flex;flex-direction:column;min-height:max-content;padding:0 0 16px}#sport-exercises .summary{padding-left:var(--page-x);padding-right:var(--page-x)}#sport-exercise-list{width:100%;padding-left:var(--page-x);padding-right:var(--page-x)}#sport-exercises .detail-content{padding-left:0;padding-right:0}.exercise-list{display:flex;flex-direction:column;gap:40px;padding:160px var(--page-x) 16px}.exercise-item{width:100%;min-height:56px;display:flex;align-items:flex-start;text-align:left}.exercise-title{display:block;max-width:100%;white-space:normal}.sets-table{margin-top:auto;width:100%;padding-top:64px}.sets-rows{display:flex;flex-direction:column}.set-row+.set-row{margin-top:2px}.set-row{display:grid;grid-template-columns:var(--set-input-width) 6px var(--set-input-width) 6px var(--set-rest-width) minmax(0,1fr) var(--set-control-size);align-items:center;width:100%;height:67px}.set-row .set-input:nth-of-type(1){grid-column:1}.set-row .set-input:nth-of-type(2){grid-column:3}.set-row .set-rest{grid-column:5}.set-input{width:var(--set-input-width);max-width:var(--set-input-width);height:67px;color:var(--text);-webkit-text-fill-color:var(--text);font-size:var(--display-text-size);line-height:1;padding:0;text-align:left}.set-input:focus,.set-rest:focus{color:var(--accent);-webkit-text-fill-color:var(--accent)}.set-rest{width:56px;height:44px;color:var(--detail);-webkit-text-fill-color:var(--detail);font-size:12px;line-height:1;font-weight:700;padding:0;text-align:left}.set-check{grid-column:7;width:var(--set-control-size);height:var(--set-control-size);border-radius:22px;background:#272c49;justify-self:end;display:flex;align-items:center;justify-content:center;margin-left:32px}.set-check.checked{background:#3C61DA}.set-check::before{content:'check';font-family:'Material Symbols Rounded';font-size:24px}.set-row.is-done .set-input,.set-row.is-done .set-rest{color:var(--inactive)!important;-webkit-text-fill-color:var(--inactive)!important;text-decoration-line:line-through;text-decoration-thickness:4px;pointer-events:none}.sets-section-head{display:flex;align-items:center;justify-content:flex-start;margin-bottom:18px}.sets-section-label{font-size:12px;font-weight:700}.sets-col-header{display:grid;grid-template-columns:var(--set-input-width) 6px var(--set-input-width) 6px var(--set-rest-width);margin-bottom:16px}.sets-col-header span{color:var(--inactive);font-size:12px;font-weight:500;text-transform:uppercase;text-align:left}.sets-col-header span:nth-child(1){grid-column:1}.sets-col-header span:nth-child(2){grid-column:3}.sets-col-header span:nth-child(3){grid-column:5}.sets-workout-block{margin-top:32px}#sport-detail.is-complete .nav-cta{display:none}
+    .loader{position:fixed;inset:0;z-index:10000;display:flex;align-items:center;justify-content:center;background:rgba(8,10,20,.64);opacity:0;pointer-events:none;transition:opacity 220ms ease}.loader.show{opacity:1;pointer-events:all}.spinner{width:36px;height:36px;border-radius:999px;border:4px solid rgba(255,255,255,.16);border-top-color:#fff;animation:spin 820ms linear infinite}@keyframes spin{to{transform:rotate(360deg)}}.overlay{position:fixed;inset:0;background:rgba(0,0,0,0);z-index:200;pointer-events:none;transition:background 300ms ease}.overlay.open{background:rgba(0,0,0,.6);pointer-events:all}.bottomsheet{position:fixed;bottom:0;left:50%;transform:translateX(-50%) translateY(100%);width:100%;max-width:480px;background:var(--surface);border-radius:32px 32px 0 0;padding:24px var(--page-x) calc(24px + env(safe-area-inset-bottom));transition:transform 350ms cubic-bezier(.32,.72,0,1);z-index:201;display:flex;flex-direction:column;gap:64px}.bottomsheet.open{transform:translateX(-50%) translateY(0)}.bottomsheet-title{font-size:22px;line-height:1.15;font-weight:800;margin-bottom:12px}.bottomsheet-subtitle{font-size:14px;line-height:1.45;font-weight:500}.bottomsheet-actions{display:grid;grid-template-columns:1fr 2fr;gap:2px}.bottomsheet-cancel,.bottomsheet-confirm{min-height:96px;width:100%;border-radius:32px;padding:16px;font-size:16px;font-weight:700}.bottomsheet-cancel{background:#333750}.bottomsheet-confirm{background:var(--surface-3);color:var(--danger)}.toast{position:fixed;left:max(var(--page-x),calc((100vw - 480px) / 2 + var(--page-x)));right:max(var(--page-x),calc((100vw - 480px) / 2 + var(--page-x)));bottom:16px;z-index:9999;min-height:72px;padding:20px 16px;border-radius:32px;background:#161618;color:#fff;display:flex;align-items:center;font-size:14px;line-height:1.35;font-weight:700;opacity:0;transform:translateY(24px);pointer-events:none;transition:opacity 220ms ease,transform 220ms var(--ease)}.toast.show{opacity:1;transform:translateY(0)}
+    @media(max-width:390px){.diet-food-table,.sets-table{padding-top:56px}.diet-food-head,.diet-food-row{grid-template-columns:minmax(0,1fr) minmax(88px,max-content) 16px minmax(88px,max-content)}.set-row{grid-template-columns:var(--set-input-width) 5px var(--set-input-width) 5px 52px minmax(0,1fr) var(--set-control-size)}.set-rest{width:52px}.sets-col-header{grid-template-columns:var(--set-input-width) 5px var(--set-input-width) 5px 52px}}
+    @media(prefers-reduced-motion:reduce){.screen,.profile-panel,.week-panel,.diet-days-panel,.loader,.overlay,.bottomsheet,.toast{transition:none}.spinner{animation:none}}
+  </style>
+</head>
+<body>
+  <div class="app-shell">
+    <section id="home" class="screen active">
+      <header class="brand" aria-label="LindTrack"><h1 class="brand-title">LindTrack</h1><p class="brand-copy">The app for Lindo &amp; Linda</p></header>
+      <main class="home-profiles" aria-label="Select profile and section">
+        <section class="profile-item" data-user="dani"><button class="profile-trigger" type="button" data-action="toggle-profile" data-user="dani"><span class="profile-name display-text">Lindo</span></button><div class="profile-panel"><div class="profile-sections"><button class="profile-section-btn display-text" type="button" data-action="open-section" data-user="dani" data-section="diet"><span class="section-label">Diet</span></button><button class="profile-section-btn display-text" type="button" data-action="open-section" data-user="dani" data-section="sport"><span class="section-label">Training</span></button></div></div></section>
+        <section class="profile-item" data-user="andrea"><button class="profile-trigger" type="button" data-action="toggle-profile" data-user="andrea"><span class="profile-name display-text">Linda</span></button><div class="profile-panel"><div class="profile-sections"><button class="profile-section-btn display-text" type="button" data-action="open-section" data-user="andrea" data-section="diet"><span class="section-label">Diet</span></button><button class="profile-section-btn display-text" type="button" data-action="open-section" data-user="andrea" data-section="sport"><span class="section-label">Training</span></button></div></div></section>
+      </main>
+    </section>
+
+    <section id="diet-days" class="screen"><header class="nav-bar"><button class="back-btn" type="button" id="diet-home-back"><span class="icon">arrow_back</span></button><div class="nav-title" id="diet-days-title">Linda</div><span class="nav-spacer"></span></header><div class="tabs"><button class="tab-btn is-active" type="button" id="diet-tab-a">Menu A</button><button class="tab-btn" type="button" id="diet-tab-b">Menu B</button></div><main class="diet-days-viewport" id="diet-days-list"></main></section>
+    <section id="diet-meals" class="screen"><header class="nav-bar"><button class="back-btn" type="button" id="diet-back-days"><span class="icon">arrow_back</span></button><div class="nav-title" id="diet-meals-title">Linda</div><span class="nav-spacer"></span></header><section class="summary diet-summary"><div class="summary-meta"><div class="summary-title" id="diet-meal-day-title">Mon</div><div class="summary-detail" id="diet-meal-count">0 meals</div></div></section><main class="big-list" id="diet-meal-list"></main></section>
+    <section id="diet-detail" class="screen"><header class="nav-bar"><button class="back-btn" type="button" id="diet-back-meals"><span class="icon">arrow_back</span></button><div class="nav-title" id="diet-detail-title">Linda</div><span class="nav-spacer"></span></header><div class="detail-content"><section class="detail-heading"><div class="detail-top"><div class="detail-kicker" id="diet-detail-kicker">Menu A · Mon</div><div class="detail-title-small" id="diet-detail-meal">Breakfast</div></div></section><section class="diet-food-table"><div class="diet-food-head"><span>RAW<br>(GR)</span><span>COOKED<br>(GR)</span></div><div class="diet-food-rows" id="diet-food-rows"></div></section></div></section>
+
+    <section id="sport-weeks" class="screen"><header class="nav-bar"><button class="back-btn" type="button" id="sport-home-back"><span class="icon">arrow_back</span></button><div class="nav-title" id="sport-profile-title">Linda</div><button class="nav-reset" type="button" id="sport-reset-btn">Reset</button></header><main class="weeks-list" id="sport-weeks-list"></main></section>
+    <section id="sport-exercises" class="screen"><header class="nav-bar"><button class="back-btn" type="button" id="sport-back-weeks"><span class="icon">arrow_back</span></button><div class="nav-title" id="sport-exercise-title">Linda</div><span class="nav-spacer"></span></header><div class="exercise-screen-content"><section class="summary"><div class="summary-meta"><div class="summary-title" id="sport-day-name">Monday</div><div class="summary-detail" id="sport-progress-count">0/0 exercises</div></div><div class="progressbar"><div class="progressbar-track"></div><div class="progressbar-fill" id="sport-progress-fill"></div></div></section><main id="sport-exercise-list" class="exercise-list"></main></div></section>
+    <section id="sport-detail" class="screen"><header class="nav-bar"><button class="back-btn" type="button" id="sport-back-exercises"><span class="icon">arrow_back</span></button><div class="nav-title" id="sport-detail-nav-title">Linda</div><button class="nav-cta" type="button" id="sport-complete-btn">Complete</button></header><div class="detail-content"><section class="detail-heading" id="sport-detail-heading"><div class="detail-top"><div class="detail-kicker" id="sport-detail-day">Monday</div><div class="detail-title-small" id="sport-detail-exercise">Bench press</div></div></section><section class="sets-table"><div class="sets-rows" id="sport-sets-rows"></div></section></div></section>
+  </div>
+
+  <div class="loader" id="app-loader"><div class="spinner"></div></div>
+  <div class="overlay" id="sport-overlay"></div>
+  <div class="bottomsheet" id="sport-bottomsheet"><div><div class="bottomsheet-title">Reset the mesocycle</div><div class="bottomsheet-subtitle">All days and weeks will be marked as incomplete. Your saved weights and reps will stay exactly as they are.</div></div><div class="bottomsheet-actions"><button class="bottomsheet-cancel" type="button" id="sport-sheet-cancel">Cancel</button><button class="bottomsheet-confirm" type="button" id="sport-sheet-confirm">Reset</button></div></div>
+  <div class="toast" id="app-toast"></div>
+
+  <script>
+    'use strict';
+    const DEBUG=false;
+    const Config={
+      users:{dani:'Lindo',andrea:'Linda'},
+      endpoints:{
+        diet:'https://script.google.com/macros/s/AKfycbw-3PyEVb2Y0RmN1v7qjOlToGW80Mr7-s41rJSfmeBXy49HakYjv8lknIyBN2RqCrLf4g/exec',
+        sport:'https://script.google.com/macros/s/AKfycbxYc2CQSjlIjC6sWoa8Zr8liomPIDaRbw_qC4wEx1gXFhRfplRfpq5BIilW2M5W-L61Kg/exec'
+      },
+      diet:{menus:['a','b'],menuLabels:{a:'Menu A',b:'Menu B'},days:['lunes','martes','miercoles','jueves','viernes','sabado'],dayLabels:{lunes:'Mon',martes:'Tue',miercoles:'Wed',jueves:'Thu',viernes:'Fri',sabado:'Sat'},mealLabels:{desayuno:'Breakfast',comida:'Lunch',almuerzo:'Lunch',snack:'Snack',merienda:'Snack',cena:'Dinner'}},
+      sport:{weeks:['w1','w2','w3','w4'],days:['lunes','miercoles','viernes'],dayLabels:{lunes:'Mon',miercoles:'Wed',viernes:'Fri'},sheetByUser:{dani:'lindo',andrea:'linda'}},
+      motion:{duration:260},
+      cache:{dietTtlMs:5*60*1000,sportTtlMs:5*60*1000}
+    };
+    const USER_LABELS=Config.users;
+    // Endpoints are accessed through Config.endpoints by the API modules.
+    const $=selector=>document.querySelector(selector);
+    const $$=selector=>Array.from(document.querySelectorAll(selector));
+    const app={openUser:null,activeUser:null,activeSection:null};
+
+    const Router={
+      current:'home',
+      history:['home'],
+      show(id,direction='right'){
+        $$('.screen').forEach(screen=>screen.classList.remove('active','from-left'));
+        const target=document.getElementById(id);
+        if(!target)return;
+        if(direction==='left')target.classList.add('from-left');
+        requestAnimationFrame(()=>{
+          target.classList.add('active');
+          target.classList.remove('from-left');
+          target.scrollTop=0;
+          if(Router.current!==id)Router.history.push(id);
+          Router.current=id;
+        });
+      },
+      backHome(){Router.show('home','left')},
+      reset(){Router.current='home';Router.history=['home']}
+    };
+
+    const UI={
+      els:{loader:document.getElementById('app-loader'),toast:document.getElementById('app-toast')},
+      loadingCount:0,
+      toastTimer:null,
+      showLoader(){
+        UI.loadingCount+=1;
+        UI.els.loader.classList.add('show');
+      },
+      hideLoader(){
+        UI.loadingCount=Math.max(0,UI.loadingCount-1);
+        if(UI.loadingCount===0)UI.els.loader.classList.remove('show');
+      },
+      resetLoader(){
+        UI.loadingCount=0;
+        UI.els.loader.classList.remove('show');
+      },
+      showToast(message,isError=false){
+        const el=UI.els.toast;
+        el.textContent=message;
+        el.classList.add('show');
+        clearTimeout(UI.toastTimer);
+        UI.toastTimer=setTimeout(()=>el.classList.remove('show'),isError?3600:1800);
+      }
+    };
+
+    const Utils={
+      normalizeDay(value){return String(value||'').trim().toLowerCase().replace('miércoles','miercoles').replace('sábado','sabado')},
+      capitalize(value){const clean=String(value||'').trim();return clean?clean.charAt(0).toUpperCase()+clean.slice(1).toLowerCase():''},
+      displayDash(value){const clean=String(value??'').trim();return clean===''||clean==='-'?'-':clean},
+      displayZero(value){const clean=String(value??'').trim();return clean===''?'0':clean},
+      safeText(value){return String(value??'').replace(/[&<>"']/g,char=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[char]))},
+      prefersReducedMotion(){return window.matchMedia('(prefers-reduced-motion: reduce)').matches}
+    };
+
+    const Debug={
+      log(...args){if(DEBUG)console.log('[LindTrack]',...args)},
+      assert(condition,message){if(DEBUG)console.assert(condition,message)},
+      state(){if(DEBUG)console.table({screen:Router.current,user:app.activeUser,section:app.activeSection})}
+    };
+
+    const DietApi={
+      async getMenu(sheetName){
+        const url=Config.endpoints.diet+'?action=getMenu&sheetName='+encodeURIComponent(sheetName);
+        const response=await fetch(url,{method:'GET',cache:'no-store'});
+        if(!response.ok)throw new Error('HTTP '+response.status+' '+sheetName);
+        const result=await response.json();
+        if(!result.ok)throw new Error(result.error||'Error cargando '+sheetName);
+        return Array.isArray(result.data)?result.data:[];
+      }
+    };
+
+    const SportApi={
+      async request(payload){
+        const response=await fetch(Config.endpoints.sport,{method:'POST',redirect:'follow',headers:{'Content-Type':'text/plain;charset=utf-8'},body:JSON.stringify(payload)});
+        const data=await response.json();
+        if(!data.ok)throw new Error(data.error||'Sheets request failed');
+        return data;
+      }
+    };
+
+    function showScreen(id,direction='right'){Router.show(id,direction)}
+    function showLoader(){UI.showLoader()}
+    function hideLoader(){UI.hideLoader()}
+    function showToast(message,isError=false){UI.showToast(message,isError)}
+    function userLabel(user){return USER_LABELS[user]||'Linda'}
+
+    const Home={
+      els:{profileItems:()=>$$('.profile-item')},
+      reset(){app.openUser=null;app.activeUser=null;app.activeSection=null;Home.sync();Router.reset()},
+      sync(){
+        Home.els.profileItems().forEach(item=>{
+          const isOpen=item.dataset.user===app.openUser;
+          const isInactive=Boolean(app.openUser)&&!isOpen;
+          item.classList.toggle('is-open',isOpen);
+          item.classList.toggle('is-inactive',isInactive);
+        });
+      },
+      toggleProfile(user){
+        app.openUser=app.openUser===user?null:user;
+        Home.sync();
+      },
+      goHome(){
+        Home.reset();
+        UI.resetLoader();
+        Router.backHome();
+      },
+      async openSection(user,section){
+        app.openUser=user;
+        app.activeUser=user;
+        app.activeSection=section;
+        Home.sync();
+        if(section==='diet'){
+          await Diet.start(user);
+          Router.show('diet-days');
+        }else{
+          await Sport.start(user);
+          Router.show('sport-weeks');
+        }
+        Debug.state();
+      }
+    };
+
+    function syncProfiles(){Home.sync()}
+    function toggleProfile(user){Home.toggleProfile(user)}
+    function goHome(){Home.goHome()}
+    async function openSection(user,section){return Home.openSection(user,section)}
+
+    const AppRefresh={
+      async current(){
+        if(app.activeSection==='diet')return Diet.refresh();
+        if(app.activeSection==='sport')return Sport.refresh();
+      }
+    };
+
+    const Diet=(()=>{const DAYS=Config.diet.days;const DAY_LABELS=Config.diet.dayLabels;const MENU_LABELS=Config.diet.menuLabels;const cache={dani:{loaded:false,loadedAt:0,rows:{a:[],b:[]}},andrea:{loaded:false,loadedAt:0,rows:{a:[],b:[]}}};const state={user:null,menu:'a',day:null,mealKey:null,animating:false,rows:{a:[],b:[]}};const els={daysTitle:$('#diet-days-title'),mealsTitle:$('#diet-meals-title'),detailTitle:$('#diet-detail-title'),tabA:$('#diet-tab-a'),tabB:$('#diet-tab-b'),daysList:$('#diet-days-list'),mealDayTitle:$('#diet-meal-day-title'),mealCount:$('#diet-meal-count'),mealList:$('#diet-meal-list'),foodRows:$('#diet-food-rows'),detailKicker:$('#diet-detail-kicker'),detailMeal:$('#diet-detail-meal'),homeBack:$('#diet-home-back'),backDays:$('#diet-back-days'),backMeals:$('#diet-back-meals')};
+      function sheetName(menu){return state.user+'_'+menu}
+      function normalizeDay(day){return Utils.normalizeDay(day)}
+      function formatMealName(value){const key=Utils.normalizeDay(value);return Config.diet.mealLabels[key]||Utils.capitalize(value)}
+      function displayValue(value){return Utils.displayDash(value)}
+      function normalizeRow(row,menu){return DietPlan.normalizeRow(row,menu)}
+      async function loadMenu(menu){
+        const data=await DietApi.getMenu(sheetName(menu));
+        const rows=data.map(row=>normalizeRow(row,menu));
+        state.rows[menu]=rows;
+        cache[state.user].rows[menu]=rows;
+      }
+      async function ensureLoaded(user){
+        state.user=user;
+        state.rows=cache[user].rows;
+        const fresh=cache[user].loaded&&(Date.now()-cache[user].loadedAt<Config.cache.dietTtlMs);
+        if(fresh)return;
+        showLoader();
+        try{
+          await Promise.all(Config.diet.menus.map(menu=>loadMenu(menu)));
+          cache[user].loaded=true;
+          cache[user].loadedAt=Date.now();
+          state.rows=cache[user].rows;
+        }catch(error){
+          showToast(error.message,true);
+        }finally{
+          hideLoader();
+        }
+      }
+      async function start(user){
+        state.user=user;
+        state.menu='a';
+        state.day=null;
+        state.mealKey=null;
+        els.daysTitle.textContent=userLabel(user);
+        els.mealsTitle.textContent=userLabel(user);
+        els.detailTitle.textContent=userLabel(user);
+        setTabs();
+        await ensureLoaded(user);
+        renderDays();
+      }
+      function selectMenu(menu){
+        if(state.menu===menu||state.animating)return;
+        const previousMenu=state.menu;
+        const direction=menu>previousMenu?'forward':'backward';
+        state.menu=menu;
+        state.day=null;
+        state.mealKey=null;
+        setTabs();
+        renderDays({animate:true,direction});
+      }
+      function setTabs(){els.tabA.classList.toggle('is-active',state.menu==='a');els.tabB.classList.toggle('is-active',state.menu==='b')}
+      function rowsFor(menu=state.menu){return state.rows[menu]||[]}
+      function mealsForDay(day,menu=state.menu){return DietPlan.mealsForDay(rowsFor(menu),day)}
+      function createDayButton(day,menu=state.menu){
+        const meals=mealsForDay(day,menu);
+        const btn=document.createElement('button');
+        btn.type='button';
+        btn.className='big-option'+(meals.length?'':' is-empty');
+        const label=document.createElement('span');
+        label.className='display-text';
+        label.textContent=DAY_LABELS[day];
+        const detail=document.createElement('span');
+        detail.className='option-detail detail-text';
+        detail.textContent=meals.length||'';
+        btn.append(label,detail);
+        btn.addEventListener('click',()=>goToDay(day));
+        return btn;
+      }
+      function buildDaysPanel(menu=state.menu){
+        const panel=document.createElement('div');
+        panel.className='diet-days-panel';
+        DAYS.forEach(day=>panel.appendChild(createDayButton(day,menu)));
+        return panel;
+      }
+      function renderDays(options={}){
+        const viewport=els.daysList;
+        const current=viewport.querySelector('.diet-days-panel');
+        const next=buildDaysPanel(state.menu);
+        const shouldAnimate=options.animate&&current&&!Utils.prefersReducedMotion();
+        if(!shouldAnimate){
+          viewport.replaceChildren(next);
+          return;
+        }
+        state.animating=true;
+        const enterFrom=options.direction==='forward'?100:-100;
+        const exitTo=options.direction==='forward'?-100:100;
+        next.style.transform='translateX('+enterFrom+'%)';
+        viewport.appendChild(next);
+        requestAnimationFrame(()=>{
+          current.style.transform='translateX('+exitTo+'%)';
+          next.style.transform='translateX(0)';
+        });
+        const finish=()=>{
+          next.removeEventListener('transitionend',finish);
+          viewport.replaceChildren(next);
+          next.style.transform='';
+          state.animating=false;
+        };
+        next.addEventListener('transitionend',finish,{once:true});
+        setTimeout(()=>{if(state.animating)finish()},420);
+      }
+      function goToDay(day){state.day=normalizeDay(day);renderMeals(false)}
+      function renderMeals(back=false){const meals=mealsForDay(state.day);els.mealDayTitle.textContent=DAY_LABELS[state.day]||state.day;els.mealCount.textContent=meals.length+' meals';const list=els.mealList;list.innerHTML='';if(!meals.length){list.className='empty-state';list.textContent='No meals for this day.'}else{list.className='big-list';meals.forEach(meal=>list.appendChild(createMealButton(meal)))}showScreen('diet-meals',back?'left':'right')}
+      function createMealButton(meal){
+        const btn=document.createElement('button');
+        btn.type='button';
+        btn.className='big-option';
+        const label=document.createElement('span');
+        label.className='display-text';
+        label.textContent=formatMealName(meal.meal_name);
+        btn.appendChild(label);
+        btn.addEventListener('click',()=>goToMeal(meal.key));
+        return btn;
+      }
+      function currentMeal(){return mealsForDay(state.day).find(meal=>meal.key===state.mealKey)||null}
+      function goToMeal(key){state.mealKey=key;renderDetail();showScreen('diet-detail')}
+      function renderDetail(){const meal=currentMeal();const rows=els.foodRows;rows.innerHTML='';rows.className='diet-food-rows';if(!meal){rows.className='empty-state';rows.textContent='No foods for this meal.';return}els.detailKicker.textContent=MENU_LABELS[state.menu]+' · '+(DAY_LABELS[meal.day]||meal.day);els.detailMeal.textContent=formatMealName(meal.meal_name);meal.foods.forEach(food=>rows.appendChild(createFoodRow(food)))}
+      function refresh({force=false}={}){if(!state.user)return Promise.resolve();if(force)cache[state.user].loaded=false;return ensureLoaded(state.user).then(()=>renderDays())}
+      function createFoodRow(food){
+        const row=document.createElement('div');
+        row.className='diet-food-row';
+        const name=document.createElement('div');
+        name.className='diet-food-name';
+        name.textContent=food.food_name;
+        const raw=document.createElement('div');
+        raw.className='diet-food-value raw';
+        raw.textContent=displayValue(food.raw_gr);
+        const cooked=document.createElement('div');
+        cooked.className='diet-food-value cooked';
+        cooked.textContent=displayValue(food.cooked_gr);
+        row.append(name,raw,cooked);
+        return row;
+      }
+      function init(){els.homeBack.addEventListener('click',goHome);els.backDays.addEventListener('click',()=>showScreen('diet-days','left'));els.backMeals.addEventListener('click',()=>renderMeals(true));els.tabA.addEventListener('click',()=>selectMenu('a'));els.tabB.addEventListener('click',()=>selectMenu('b'))}
+      return{init,start,refresh};
+    })();
+
+
+    const DietPlan={
+      normalizeRow(row,menu){
+        return {
+          ...row,
+          _menu:menu,
+          id:Number(row.id),
+          day:Utils.normalizeDay(row.day),
+          meal_order:Number(row.meal_order),
+          meal_time:String(row.meal_time??''),
+          meal_name:String(row.meal_name||'').trim(),
+          food_order:Number(row.food_order),
+          food_name:String(row.food_name||'').trim(),
+          raw_gr:String(row.raw_gr??'').trim(),
+          cooked_gr:String(row.cooked_gr??'').trim()
+        };
+      },
+      mealsForDay(rows,day){
+        const map=new Map();
+        rows
+          .filter(row=>row.day===Utils.normalizeDay(day))
+          .forEach(row=>{
+            const key=row.day+'-'+row.meal_order;
+            if(!map.has(key)){
+              map.set(key,{key,day:row.day,meal_order:row.meal_order,meal_time:row.meal_time,meal_name:row.meal_name,foods:[]});
+            }
+            map.get(key).foods.push(row);
+          });
+        return Array.from(map.values());
+      }
+    };
+
+    const SportPlan={
+      empty(){return {w1:{lunes:[],miercoles:[],viernes:[]},w2:{lunes:[],miercoles:[],viernes:[]},w3:{lunes:[],miercoles:[],viernes:[]},w4:{lunes:[],miercoles:[],viernes:[]}}},
+      splitList(value){return String(value??'').trim().split(';').map(item=>item.trim()).filter(Boolean)},
+      parseSets(value){return SportPlan.splitList(value).map(token=>{const cleaned=token.replace('×','x').replace('*','x');const parts=cleaned.includes('x')?cleaned.split('x'):cleaned.split('X');if(parts.length>1)return{kg:String(parts[0]||'').trim(),reps:String(parts.slice(1).join('x')||'').trim(),rest:''};return{kg:'',reps:token,rest:''}})},
+      normalizeRest(value){const raw=String(value??'').trim();if(!raw)return'';const parts=raw.split(':');if(parts.length>1)return String(Number(parts[0]||0))+':'+String(parts[1]||'00').padStart(2,'0');const num=parseFloat(raw);if(Number.isFinite(num))return Math.floor(num)+':'+(num%1?'30':'00');return raw},
+      parseRests(value){return SportPlan.splitList(value).map(SportPlan.normalizeRest).filter(Boolean)},
+      mergeSetsAndRests(sets,rests,fallbackRest){const r=rests.length?rests:[fallbackRest||'1:00'];return sets.map((set,index)=>({...set,rest:r[index]||r[r.length-1]||fallbackRest||'1:00'}))},
+      defaultRepsForName(name){const n=String(name||'').toLowerCase();return n.includes('face pull')||n.includes('abductor')||n.includes('pushdown')||n.includes('lateral raises')?15:12},
+      workSetsFromOldRow(row){const indexes=Object.keys(row).reduce((set,item)=>{const parts=String(item).split('_');const num=Number(parts[1]);if((parts[0]==='kg'||parts[0]==='reps')&&Number.isInteger(num)&&num>0)set.add(num);return set},new Set());const ordered=Array.from(indexes).sort((a,b)=>a-b);if(ordered.length){const sets=ordered.map(num=>({kg:row['kg_'+num]||'',reps:row['reps_'+num]||''})).filter(item=>item.kg||item.reps);if(sets.length)return sets}return Array.from({length:Number(row.target_sets)||0},()=>({kg:'',reps:String(SportPlan.defaultRepsForName(row.exercise))}))},
+      rowsToPlan(rows){const plan=SportPlan.empty();rows.filter(row=>row&&row.week&&row.day&&row.exercise_id).sort((a,b)=>String(a.week).localeCompare(String(b.week))||Config.sport.days.indexOf(String(a.day))-Config.sport.days.indexOf(String(b.day))||Number(a.order)-Number(b.order)).forEach(row=>{const week=String(row.week).trim();const day=String(row.day).trim();if(!plan[week])plan[week]={lunes:[],miercoles:[],viernes:[]};if(!plan[week][day])return;const warmupBase=row.warmup_sets?SportPlan.parseSets(row.warmup_sets):SportPlan.parseSets(row.warmup);const workoutBase=row.workout_sets?SportPlan.parseSets(row.workout_sets):SportPlan.workSetsFromOldRow(row);const warmupRests=SportPlan.parseRests(row.warmup_rests||row.warmup_rest);const workoutRests=SportPlan.parseRests(row.workout_rests||row.work_rest);plan[week][day].push({id:String(row.exercise_id).trim(),name:String(row.exercise||'').trim(),rir:String(row.rir||'').trim(),warmupSets:SportPlan.mergeSetsAndRests(warmupBase,warmupRests,'1:00'),sets:SportPlan.mergeSetsAndRests(workoutBase,workoutRests,'1:00'),completed:row.done===true||String(row.done).toUpperCase()==='TRUE'})});return plan},
+      findExercise(plan,user,week,day,exerciseId){return (((plan[user]||{})[week]||{})[day]||[]).find(item=>item.id===exerciseId)},
+      updateSetValue(plan,user,week,day,exerciseId,index,field,value){const ex=SportPlan.findExercise(plan,user,week,day,exerciseId);if(!ex)return;if(String(index).startsWith('w')){const i=Number(String(index).slice(1));if(ex.warmupSets[i])ex.warmupSets[i][field]=value}else{const i=Number(index);if(ex.sets[i])ex.sets[i][field]=value}},
+      updateSetRest(plan,user,week,day,exerciseId,index,value){const ex=SportPlan.findExercise(plan,user,week,day,exerciseId);if(!ex)return;if(String(index).startsWith('w')){const i=Number(String(index).slice(1));if(ex.warmupSets[i])ex.warmupSets[i].rest=value}else{const i=Number(index);if(ex.sets[i])ex.sets[i].rest=value}},
+      updateExerciseDone(plan,user,week,day,exerciseId,value){const ex=SportPlan.findExercise(plan,user,week,day,exerciseId);if(ex)ex.completed=Boolean(value)}
+    };
+
+    const SportSync={
+      pendingKey:'lindgym:pendingSync:v1',
+      key(parts){return ['lindgym'].concat(parts).join(':')},
+      localValueKey(user,week,day,exerciseId,index,field){return SportSync.key([user,week,day,exerciseId,'local',index,field])},
+      exerciseDoneKey(user,week,day,exerciseId){return SportSync.key([user,week,day,exerciseId,'done'])},
+      setDoneKey(user,week,day,exerciseId,index){return SportSync.key([user,week,day,exerciseId,'set',index])},
+      warmupDoneKey(user,week,day,exerciseId,index){return SportSync.key([user,week,day,exerciseId,'warmup',index])},
+      readPending(){try{return JSON.parse(localStorage.getItem(SportSync.pendingKey)||'[]')}catch(error){return[]}},
+      writePending(items){localStorage.setItem(SportSync.pendingKey,JSON.stringify(items||[]))},
+      changeKey(change){return [change.user,change.week,change.day,change.exerciseId,change.index,change.field].join('|')},
+      queue(change){
+        const items=SportSync.readPending();
+        const unique=items.filter(item=>SportSync.changeKey(item)!==SportSync.changeKey(change));
+        unique.push({...change,createdAt:change.createdAt||Date.now(),updatedAt:Date.now()});
+        SportSync.writePending(unique);
+      },
+      remove(change){SportSync.writePending(SportSync.readPending().filter(item=>SportSync.changeKey(item)!==SportSync.changeKey(change)))},
+      saveLocalValue(user,week,day,exerciseId,index,field,value){localStorage.setItem(SportSync.localValueKey(user,week,day,exerciseId,index,field),String(value??''))},
+      clearLocalValue(change){localStorage.removeItem(SportSync.localValueKey(change.user,change.week,change.day,change.exerciseId,change.index,change.field))},
+      getLocalValue(user,week,day,exerciseId,index,field,fallback){
+        const saved=localStorage.getItem(SportSync.localValueKey(user,week,day,exerciseId,index,field));
+        return saved===null?fallback:saved;
+      },
+      isExerciseDone(user,week,day,exerciseId){return localStorage.getItem(SportSync.exerciseDoneKey(user,week,day,exerciseId))==='true'},
+      setExerciseDone(user,week,day,exerciseId,value){localStorage.setItem(SportSync.exerciseDoneKey(user,week,day,exerciseId),value?'true':'false')},
+      isSetDone(user,week,day,exerciseId,index){return localStorage.getItem(SportSync.setDoneKey(user,week,day,exerciseId,index))==='true'},
+      setSetDone(user,week,day,exerciseId,index,value){localStorage.setItem(SportSync.setDoneKey(user,week,day,exerciseId,index),value?'true':'false')},
+      isWarmupDone(user,week,day,exerciseId,index){return localStorage.getItem(SportSync.warmupDoneKey(user,week,day,exerciseId,index))==='true'},
+      setWarmupDone(user,week,day,exerciseId,index,value){localStorage.setItem(SportSync.warmupDoneKey(user,week,day,exerciseId,index),value?'true':'false')},
+      clearCompletionKeys(user){
+        const prefix='lindgym:'+user+':';
+        const keys=[];
+        for(let i=0;i<localStorage.length;i++){
+          const item=localStorage.key(i);
+          if(item&&item.startsWith(prefix)&&(item.includes(':done')||item.includes(':set:')||item.includes(':warmup:')))keys.push(item);
+        }
+        keys.forEach(item=>localStorage.removeItem(item));
+      },
+      async syncOne(change){
+        const isWarm=String(change.index).startsWith('w');
+        const payload={
+          action:change.field==='rest'?'updateSetRest':'updateSetValue',
+          sheet:Config.sport.sheetByUser[change.user],
+          week:change.week,
+          day:change.day,
+          exerciseId:change.exerciseId,
+          setType:isWarm?'warmup':'workout',
+          setIndex:isWarm?Number(String(change.index).slice(1)):Number(change.index),
+          value:String(change.value??'')
+        };
+        if(change.field!=='rest')payload.field=change.field;
+        await SportApi.request(payload);
+        SportSync.remove(change);
+        SportSync.clearLocalValue(change);
+      },
+      async flush(){
+        if(!navigator.onLine)return;
+        const items=SportSync.readPending();
+        for(const change of items){
+          try{await SportSync.syncOne(change)}catch(error){console.warn('Pending sync kept',error);break}
+        }
+      }
+    };
+
+    const Sport=(()=>{const SHEET_BY_USER=Config.sport.sheetByUser;const DAY_LABELS=Config.sport.dayLabels;const WEEKS=Config.sport.weeks;const DAYS=Config.sport.days;const state={plan:{dani:SportPlan.empty(),andrea:SportPlan.empty()},sheetsReady:false,user:'andrea',loaded:false,loadedAt:0,openWeekId:null,week:'w1',day:'lunes',exerciseId:null};const els={profileTitle:$('#sport-profile-title'),exerciseTitle:$('#sport-exercise-title'),detailNavTitle:$('#sport-detail-nav-title'),weeksList:$('#sport-weeks-list'),dayName:$('#sport-day-name'),progressCount:$('#sport-progress-count'),progressFill:$('#sport-progress-fill'),exerciseList:$('#sport-exercise-list'),detailScreen:$('#sport-detail'),detailDay:$('#sport-detail-day'),detailExercise:$('#sport-detail-exercise'),setsRows:$('#sport-sets-rows'),homeBack:$('#sport-home-back'),backWeeks:$('#sport-back-weeks'),backExercises:$('#sport-back-exercises'),completeBtn:$('#sport-complete-btn'),resetBtn:$('#sport-reset-btn'),overlay:$('#sport-overlay'),bottomsheet:$('#sport-bottomsheet'),sheetCancel:$('#sport-sheet-cancel'),sheetConfirm:$('#sport-sheet-confirm')};
+      const basePlan=(user=state.user,week=state.week)=>((state.plan[user]||{})[week])||{lunes:[],miercoles:[],viernes:[]};
+      function readPendingSync(){return SportSync.readPending()}
+      function queuePendingChange(change){SportSync.queue(change)}
+      function saveLocalSetValue(user,week,day,exerciseId,index,field,value){SportSync.saveLocalValue(user,week,day,exerciseId,index,field,value)}
+      function getSetValue(exerciseId,week,day,index,field,fallback,user=state.user){return SportSync.getLocalValue(user,week,day,exerciseId,index,field,fallback)}
+      function normalizeRest(value){return SportPlan.normalizeRest(value)}
+      function rowsToPlan(rows){return SportPlan.rowsToPlan(rows)}
+      async function sheetsRequest(payload){return SportApi.request(payload)}
+      async function flushPendingSync(){return SportSync.flush()}function applyPendingToPlanCache(){readPendingSync().forEach(change=>{if(change.field==='rest')updatePlanSetRest(change.user,change.week,change.day,change.exerciseId,change.index,change.value);else updatePlanSetValue(change.user,change.week,change.day,change.exerciseId,change.index,change.field,change.value)})}async function loadPlanFromSheets(){const data=await sheetsRequest({action:'getPlan'});state.plan.dani=rowsToPlan(data.lindo||[]);state.plan.andrea=rowsToPlan(data.linda||[]);state.sheetsReady=true;applyPendingToPlanCache()}
+      function getExercise(day=state.day,exerciseId=state.exerciseId){return(basePlan()[day]||[]).find(ex=>ex.id===exerciseId)}function isExerciseCompleted(exerciseId,week,day,user=state.user){const ex=(((state.plan[user]||{})[week]||{})[day]||[]).find(item=>item.id===exerciseId);if(ex&&typeof ex.completed==='boolean')return ex.completed;return SportSync.isExerciseDone(user,week,day,exerciseId)}function setExerciseCompleted(exerciseId,week,day,value,user=state.user){SportSync.setExerciseDone(user,week,day,exerciseId,value);updatePlanExerciseDone(user,week,day,exerciseId,value);if(state.sheetsReady)sheetsRequest({action:'updateDone',sheet:SHEET_BY_USER[user],week,day,exerciseId,done:Boolean(value)}).catch(()=>showToast('Sync error',true))}function isSetDone(exerciseId,week,day,index,user=state.user){return SportSync.isSetDone(user,week,day,exerciseId,index)}function setSetDone(exerciseId,week,day,index,value,user=state.user){SportSync.setSetDone(user,week,day,exerciseId,index,value)}function isWarmupDone(exerciseId,week,day,index,user=state.user){return SportSync.isWarmupDone(user,week,day,exerciseId,index)}function setWarmupDone(exerciseId,week,day,index,value,user=state.user){SportSync.setWarmupDone(user,week,day,exerciseId,index,value)}
+      function updatePlanSetValue(user,week,day,exerciseId,index,field,value){SportPlan.updateSetValue(state.plan,user,week,day,exerciseId,index,field,value)}function updatePlanSetRest(user,week,day,exerciseId,index,value){SportPlan.updateSetRest(state.plan,user,week,day,exerciseId,index,value)}function updatePlanExerciseDone(user,week,day,exerciseId,value){SportPlan.updateExerciseDone(state.plan,user,week,day,exerciseId,value)}async function updateSetValue(index,field,value){if(!state.exerciseId)return;updatePlanSetValue(state.user,state.week,state.day,state.exerciseId,index,field,value);const change={user:state.user,week:state.week,day:state.day,exerciseId:state.exerciseId,index:String(index),field,value:String(value??'')};saveLocalSetValue(state.user,state.week,state.day,state.exerciseId,index,field,value);queuePendingChange(change)}async function updateSetRest(index,value){if(!state.exerciseId)return;const rest=normalizeRest(value);updatePlanSetRest(state.user,state.week,state.day,state.exerciseId,index,rest);const change={user:state.user,week:state.week,day:state.day,exerciseId:state.exerciseId,index:String(index),field:'rest',value:String(rest??'')};saveLocalSetValue(state.user,state.week,state.day,state.exerciseId,index,'rest',rest);queuePendingChange(change)}
+      async function start(user){state.user=user;state.openWeekId=null;els.profileTitle.textContent=userLabel(user);els.exerciseTitle.textContent=userLabel(user);els.detailNavTitle.textContent=userLabel(user);showLoader();try{await flushPendingSync();const fresh=state.loaded&&(Date.now()-state.loadedAt<Config.cache.sportTtlMs);if(!fresh){await loadPlanFromSheets();state.loaded=true;state.loadedAt=Date.now()}}catch(error){console.warn(error);applyPendingToPlanCache();showToast('Offline mode',true)}finally{renderWeeks();selectUser(user);hideLoader()}}
+      function selectUser(user){state.user=user;closeAllWeeks();showScreen('sport-weeks')}
+      async function refresh({force=false}={}){if(force)state.loaded=false;await start(state.user)}
+      function createWeekItem(week){
+        const item=document.createElement('section');
+        item.className='week-item';
+        item.dataset.week=week;
+        const trigger=document.createElement('button');
+        trigger.className='week-trigger';
+        trigger.type='button';
+        const title=document.createElement('span');
+        title.className='week-title display-text';
+        title.textContent='Week '+week.slice(1);
+        const detail=document.createElement('span');
+        detail.className='week-detail detail-text';
+        detail.textContent=week==='w4'?'Deload':'';
+        trigger.append(title,detail);
+        trigger.addEventListener('click',()=>toggleWeekAccordion(week));
+        const panel=document.createElement('div');
+        panel.className='week-panel';
+        const days=document.createElement('div');
+        days.className='week-days';
+        DAYS.forEach(day=>days.appendChild(createWeekDayButton(day,week)));
+        panel.appendChild(days);
+        item.append(trigger,panel);
+        return item;
+      }
+      function createWeekDayButton(day,week){
+        const btn=document.createElement('button');
+        btn.className='week-day-btn display-text';
+        btn.type='button';
+        btn.dataset.day=day;
+        btn.textContent=DAY_LABELS[day];
+        btn.addEventListener('click',()=>goToDay(day,week));
+        return btn;
+      }
+      function renderWeeks(){const list=els.weeksList;list.innerHTML='';WEEKS.forEach(week=>list.appendChild(createWeekItem(week)));syncWeeksUI()}
+      function isDayCompleted(day,weekId){const exercises=basePlan(state.user,weekId)[day]||[];return exercises.length>0&&exercises.every(ex=>isExerciseCompleted(ex.id,weekId,day))}function isWeekCompleted(weekId){const plan=basePlan(state.user,weekId);return Object.keys(plan).every(day=>isDayCompleted(day,weekId))}function syncWeeksUI(){$$('.week-item').forEach(item=>{const weekId=item.dataset.week;item.classList.toggle('is-done',isWeekCompleted(weekId));const detail=item.querySelector('.week-detail');if(detail)detail.classList.toggle('is-empty',!detail.textContent.trim());item.querySelectorAll('.week-day-btn').forEach(btn=>btn.classList.toggle('is-done',isDayCompleted(btn.dataset.day,weekId)))})}function closeAllWeeks(){state.openWeekId=null;$$('.week-item').forEach(item=>item.classList.remove('is-open','is-inactive'));syncWeeksUI()}function toggleWeekAccordion(weekId){const target=document.querySelector('.week-item[data-week="'+weekId+'"]');if(!target)return;const same=state.openWeekId===weekId;$$('.week-item').forEach(item=>{const isTarget=item===target;item.classList.remove('is-open','is-inactive');if(!same&&!isTarget)item.classList.add('is-inactive')});if(same){state.openWeekId=null;syncWeeksUI();return}target.classList.add('is-open');state.openWeekId=weekId;syncWeeksUI()}
+      function getDayExercises(day,week){return(basePlan(state.user,week)[day]||[]).map(ex=>({id:ex.id,name:ex.name,completed:isExerciseCompleted(ex.id,week,day)}))}function goToDay(day,week){state.day=day;state.week=week;const exercises=getDayExercises(day,week);els.dayName.textContent=DAY_LABELS[day];els.exerciseTitle.textContent=userLabel(state.user);const list=els.exerciseList;if(!exercises.length){list.className='empty-state';list.textContent='No exercises for this day.'}else{list.className='exercise-list';list.innerHTML='';exercises.forEach(ex=>list.appendChild(createExerciseButton(ex)))}updateExerciseProgress();showScreen('sport-exercises')}
+      function createExerciseButton(exercise){
+        const btn=document.createElement('button');
+        btn.className='exercise-item'+(exercise.completed?' is-complete':'');
+        btn.type='button';
+        btn.dataset.complete=String(exercise.completed);
+        const label=document.createElement('span');
+        label.className='exercise-title display-text';
+        label.textContent=exercise.name;
+        btn.appendChild(label);
+        btn.addEventListener('click',()=>openExerciseDetail(exercise.id));
+        return btn;
+      }
+      function updateExerciseProgress(){const items=Array.from(els.exerciseList.querySelectorAll('.exercise-item'));const total=items.length;const completed=items.filter(item=>item.classList.contains('is-complete')||item.dataset.complete==='true').length;els.progressCount.textContent=completed+'/'+total+' exercises';els.progressFill.style.width=(total?completed/total*100:0)+'%'}function openExerciseDetail(exerciseId){state.exerciseId=exerciseId;const exercise=getExercise(state.day,exerciseId);if(!exercise)return;els.detailNavTitle.textContent=userLabel(state.user);els.detailDay.textContent=DAY_LABELS[state.day];els.detailExercise.textContent=exercise.name;els.detailScreen.classList.toggle('is-complete',isExerciseCompleted(exerciseId,state.week,state.day));renderSets(exercise);showScreen('sport-detail')}
+      function normalizeEmptyInput(input){if(String(input.value??'').trim()==='')input.value='0'}
+      function createSetsSectionHead(label){
+        const head=document.createElement('div');
+        head.className='sets-section-head';
+        const text=document.createElement('div');
+        text.className='sets-section-label';
+        text.textContent=label;
+        head.appendChild(text);
+        return head;
+      }
+      function createSetsColHeader(){
+        const header=document.createElement('div');
+        header.className='sets-col-header';
+        ['kg','reps','rest'].forEach(label=>{
+          const span=document.createElement('span');
+          span.textContent=label;
+          header.appendChild(span);
+        });
+        return header;
+      }
+      function createSetInput({className,type,inputMode,value,disabled,onBlur}){
+        const input=document.createElement('input');
+        input.className=className;
+        input.type=type;
+        input.inputMode=inputMode;
+        input.value=String(value);
+        if(disabled)input.disabled=true;
+        input.addEventListener('blur',()=>{
+          normalizeEmptyInput(input);
+          onBlur(input.value);
+        });
+        return input;
+      }
+      function getSetDisplayValues(exercise,set,index,type){
+        const setId=type==='warmup'?'w'+index:index;
+        return {
+          setId,
+          kg:getSetValue(exercise.id,state.week,state.day,setId,'kg',set.kg),
+          reps:getSetValue(exercise.id,state.week,state.day,setId,'reps',set.reps),
+          rest:getSetValue(exercise.id,state.week,state.day,setId,'rest',set.rest||'1:00')
+        };
+      }
+      function createSetRow(exercise,set,index,type){
+        const done=type==='warmup'?isWarmupDone(exercise.id,state.week,state.day,index):isSetDone(exercise.id,state.week,state.day,index);
+        const values=getSetDisplayValues(exercise,set,index,type);
+        const row=document.createElement('div');
+        row.className='set-row'+(done?' is-done':'');
+        const kgInput=createSetInput({className:'set-input',type:'text',inputMode:'decimal',value:values.kg||'0',disabled:done,onBlur:value=>updateSetValue(values.setId,'kg',value)});
+        const repsInput=createSetInput({className:'set-input',type:'text',inputMode:'numeric',value:values.reps||'0',disabled:done,onBlur:value=>updateSetValue(values.setId,'reps',value)});
+        const restInput=createSetInput({className:'set-rest',type:'text',inputMode:'numeric',value:values.rest||'1:00',disabled:done,onBlur:value=>updateSetRest(values.setId,value)});
+        const check=document.createElement('button');
+        check.className='set-check'+(done?' checked':'');
+        check.type='button';
+        check.addEventListener('click',()=>type==='warmup'?toggleWarmupDone(index):toggleSetDone(index));
+        row.append(kgInput,repsInput,restInput,check);
+        return row;
+      }
+      function appendSetSection(parent,label,exercise,sets,type){
+        parent.appendChild(createSetsSectionHead(label));
+        parent.appendChild(createSetsColHeader());
+        sets.forEach((set,index)=>parent.appendChild(createSetRow(exercise,set,index,type)));
+      }
+      function renderSets(exercise){
+        const rows=els.setsRows;
+        rows.innerHTML='';
+        const warmupSets=exercise.warmupSets||[];
+        const workoutSets=exercise.sets||[];
+        if(warmupSets.length){
+          appendSetSection(rows,'warm-up',exercise,warmupSets,'warmup');
+          const workoutBlock=document.createElement('div');
+          workoutBlock.className='sets-workout-block';
+          appendSetSection(workoutBlock,'workout',exercise,workoutSets,'workout');
+          rows.appendChild(workoutBlock);
+          return;
+        }
+        appendSetSection(rows,'workout',exercise,workoutSets,'workout');
+      }
+      function toggleWarmupDone(index){if(!state.exerciseId)return;const next=!isWarmupDone(state.exerciseId,state.week,state.day,index);setWarmupDone(state.exerciseId,state.week,state.day,index,next);renderSets(getExercise())}function toggleSetDone(index){if(!state.exerciseId)return;const next=!isSetDone(state.exerciseId,state.week,state.day,index);setSetDone(state.exerciseId,state.week,state.day,index,next);syncExerciseFromSets(state.exerciseId);renderSets(getExercise())}function syncExerciseFromSets(exerciseId){const exercise=getExercise(state.day,exerciseId);if(!exercise)return;const complete=exercise.sets.length>0&&exercise.sets.every((_,index)=>isSetDone(exerciseId,state.week,state.day,index));setExerciseCompleted(exerciseId,state.week,state.day,complete);syncWeeksUI();els.detailScreen.classList.toggle('is-complete',complete)}function completeCurrentExercise(){if(!state.exerciseId)return;const exercise=getExercise(state.day,state.exerciseId);if(!exercise)return;exercise.sets.forEach((_,index)=>setSetDone(state.exerciseId,state.week,state.day,index,true));setExerciseCompleted(state.exerciseId,state.week,state.day,true);syncWeeksUI();goToDay(state.day,state.week);showToast('Exercise completed')}
+      function openSheet(){els.overlay.classList.add('open');els.bottomsheet.classList.add('open')}function closeSheet(){els.overlay.classList.remove('open');els.bottomsheet.classList.remove('open')}function resetMesocycle(){const user=state.user;sheetsRequest({action:'resetMesocycle',sheet:SHEET_BY_USER[user]}).catch(()=>showToast('Sync error',true));WEEKS.forEach(week=>DAYS.forEach(day=>(basePlan(user,week)[day]||[]).forEach(ex=>ex.completed=false)));SportSync.clearCompletionKeys(user);syncWeeksUI();showToast('Mesocycle reset')}
+      function init(){els.homeBack.addEventListener('click',goHome);els.backWeeks.addEventListener('click',()=>showScreen('sport-weeks','left'));els.backExercises.addEventListener('click',()=>goToDay(state.day,state.week));els.completeBtn.addEventListener('click',completeCurrentExercise);els.resetBtn.addEventListener('click',openSheet);els.overlay.addEventListener('click',closeSheet);els.sheetCancel.addEventListener('click',closeSheet);els.sheetConfirm.addEventListener('click',()=>{resetMesocycle();closeSheet()});window.addEventListener('online',()=>flushPendingSync().then(()=>selectUser(state.user)));document.addEventListener('visibilitychange',()=>{if(document.hidden)return;AppRefresh.current()})}
+      return{init,start,refresh};
+    })();
+
+    function initHome(){document.addEventListener('click',event=>{const actionEl=event.target.closest('[data-action]');if(!actionEl)return;const action=actionEl.dataset.action;if(action==='toggle-profile')Home.toggleProfile(actionEl.dataset.user);if(action==='open-section')Home.openSection(actionEl.dataset.user,actionEl.dataset.section)})}
+    function runSelfTests(){if(!DEBUG)return;Debug.assert(typeof Diet.start==='function','Diet module must expose start');Debug.assert(typeof Diet.refresh==='function','Diet module must expose refresh');Debug.assert(typeof Sport.start==='function','Sport module must expose start');Debug.assert(typeof Sport.refresh==='function','Sport module must expose refresh');Debug.assert(typeof Router.show==='function','Router must expose show');Debug.assert(typeof Router.reset==='function','Router must expose reset');Debug.assert(typeof UI.showLoader==='function','UI must expose showLoader');Debug.assert(typeof AppRefresh.current==='function','AppRefresh must expose current')}
+    initHome();Diet.init();Sport.init();syncProfiles();runSelfTests();
+  </script>
+</body>
+</html>
